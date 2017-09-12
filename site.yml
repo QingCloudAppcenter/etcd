@@ -5,5 +5,6 @@
 
   roles:
     - base
+    - appcenter-agent
     - andrewrothstein.etcd
     - etcd-service
