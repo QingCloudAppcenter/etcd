@@ -1,0 +1,7 @@
+[template]
+src = "etcd.conf.tmpl"
+dest = "/etc/etcd/etcd.conf"
+  keys = [
+    "/",
+]
+reload_cmd = "systemctl restart etcd"

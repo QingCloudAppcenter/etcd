@@ -1,0 +1,25 @@
+---
+- name: Setup etcd service def
+  become: yes
+  become_user: root
+  with_items:
+    - etcd.service
+    - etcd-grpc-proxy.service
+    - etcd-proxy.service
+  copy:
+    src: files/services/{{item}}
+    dest: /etc/systemd/system/{{item}}
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+
+- name: reload etcd service
+  become: yes
+  become_user: root
+  with_items:
+    - etcd.service
+    - etcd-grpc-proxy.service
+    - etcd-proxy.service
+  service:
+    name: '{{item}}'

@@ -1,0 +1,37 @@
+---
+
+- name: upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+
+- name: install essential pkgs
+  become: yes
+  become_user: root
+  with_items:
+    - yum-updateonboot
+    - yum-cron
+    - ntp
+    - bash
+  yum:
+    name: '{{item}}'
+    state: present
+
+- name: Enable apply updated packages
+  ini_file:
+    path: /etc/yum/yum-cron.conf
+    section: commands
+    option: apply_updates
+    value: yes
+    backup: yes
+
+- name: enable services
+  become: yes
+  become_user: root
+  with_items:
+    - yum-updateonboot
+    - yum-cron
+    - ntpd
+  service:
+    name: '{{item}}'
+    enabled: yes

@@ -1,0 +1,9 @@
+---
+- name: Setup etcd cluster
+  hosts: all
+  remote_user: root
+
+  roles:
+    - base
+    - andrewrothstein.etcd
+    - etcd-service
