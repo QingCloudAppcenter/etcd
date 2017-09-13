@@ -1,5 +1,5 @@
 ---
-name: Setup AppCenter Agent
+- name: Setup AppCenter Agent
   become: yes
   become_user: root
   get_url:
@@ -7,7 +7,7 @@ name: Setup AppCenter Agent
     dest: /tmp/app-agent-linux-amd64.tar.gz
     mode: 0644
 
-name: Extract Agent package
+- name: Extract Agent package
   become: yes
   become_user: root
   unarchive:
@@ -15,7 +15,9 @@ name: Extract Agent package
     src: /tmp/app-agent-linux-amd64.tar.gz
     dest: /tmp/
 
-name: Install Agent package
+- name: Install Agent package
   become: yes
   become_user: root
-  script: /tmp/app-agent-linux-amd64/install.sh
+  command: sh /tmp/app-agent-linux-amd64/install.sh
+  args:
+    chdir: /tmp/app-agent-linux-amd64/
