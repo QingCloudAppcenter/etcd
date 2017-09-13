@@ -1,5 +1,5 @@
 # [member]
-ETCD_NAME=etcd-proxy{{getv "/host/sid"}}
+UNIQUESID={{getv "/host/sid"}}
 ETCD_DATA_DIR="/var/lib/etcd/default.etcd"
 
 ETCD_LISTEN_PEER_URLS="http://{{getv "/host/ip"}}:2380"

@@ -1,0 +1,368 @@
+{
+    "name": {{cluster.name}},
+    "description": {{cluster.description}},
+    "vxnet": {{cluster.vxnet}},
+    "nodes": [{
+      "role": "etcd_node",
+        "container": {
+            "type": "lxc",
+            "zone": "pek3a",
+            "image": "img-0huxpbda"
+        },
+        "count": {{cluster.etcd_node.count}},
+        "instance_class": {{cluster.etcd_node.instance_class}},
+        "cpu": {{cluster.etcd_node.cpu}},
+        "memory": {{cluster.etcd_node.memory}},
+        "volume": {
+            "size": {{cluster.etcd_node.volume_size}},
+            "mount_point": "/var/lib/etcd/",
+            "filesystem": "ext4",
+            "mount_options": "defaults,noatime",
+            "class": {{cluster.etcd_node.volume_class}}
+
+        },
+        "server_id_upper_bound": 255,
+        "vertical_scaling_policy": "parallel",
+        "services": {
+            "start": {
+                "cmd": "/usr/local/bin/start.sh",
+                "timeout": 86400
+            },
+            "stop": {
+                "cmd": "/usr/local/bin/stop.sh"
+            },
+            "destroy": {
+              "cmd": "/usr/local/bin/leave.sh"
+            },
+            "compact": {
+              "type": "custom",
+              "cmd": "/usr/local/bin/etcdmanager compact",
+              "timeout": 86400
+            }
+        },
+        "health_check": {
+            "enable": true,
+            "interval_sec": 60,
+            "timeout_sec": 10,
+            "action_timeout_sec": 60,
+            "healthy_threshold": 3,
+            "unhealthy_threshold": 3,
+            "check_cmd": "curl http://127.0.0.1:2379/health",
+            "action_cmd": "/usr/local/bin/etcdmanager stop;/usr/local/bin/etcdmanager leave;sleep 5;kill -9 `pgrep etcd`;rm -rf /var/lib/etcd/*;/usr/local/bin/etcdmanager join"
+        },
+          "env": {
+                "etcautocompact": {{env.etcd_node.autocompact}}
+        },
+        "monitor": {
+            "enable": true,
+            "cmd": "/usr/local/bin/prom2json http://127.0.0.1:2379/metrics",
+            "items": {
+               "etcd_grpc_proxy_cache_hits_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_grpc_proxy_cache_misses_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_grpc_proxy_events_coalescing_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_grpc_proxy_watchers_coalescing_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_network_client_grpc_received_bytes_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_network_client_grpc_sent_bytes_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_network_peer_received_bytes_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_network_peer_sent_bytes_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_server_has_leader":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_server_leader_changes_seen_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_server_proposals_applied_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_server_proposals_committed_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_server_proposals_failed_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_server_proposals_pending":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "http_requests_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "process_cpu_seconds_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "process_max_fds":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "process_open_fds":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "process_resident_memory_bytes":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "process_start_time_seconds":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "process_virtual_memory_bytes":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          }
+            },
+            "groups": {
+                "etcd": ["etcd_server_has_leader","etcd_network_peer_sent_bytes_total","etcd_grpc_proxy_watchers_coalescing_total"],
+                "process": ["process_cpu_seconds_total","process_resident_memory_bytes","process_virtual_memory_bytes","http_requests_total"]
+            },
+            "display": ["etcd", "process"],
+            "alarm": ["etcd_server_has_leader"]
+        }
+    },{
+      "role": "etcd_proxy",
+        "container": {
+            "type": "lxc",
+            "zone": "pek3a",
+            "image": "img-pwohbche"
+        },
+        "count": {{cluster.etcd_proxy.count}},
+        "instance_class": {{cluster.etcd_proxy.instance_class}},
+        "cpu": {{cluster.etcd_proxy.cpu}},
+        "memory": {{cluster.etcd_proxy.memory}},
+        "server_id_upper_bound": 255,
+        "vertical_scaling_policy": "parallel",
+        "services": {
+            "destroy": {
+              "cmd": "systemctl stop etcd"
+            }
+        },
+        "health_check": {
+            "enable": true,
+            "interval_sec": 60,
+            "timeout_sec": 10,
+            "action_timeout_sec": 60,
+            "healthy_threshold": 3,
+            "unhealthy_threshold": 3,
+            "check_cmd": "curl http://127.0.0.1:2379/health",
+            "action_cmd": "systemctl restart etcd"
+        },
+        "monitor": {
+            "enable": true,
+            "cmd": "/usr/local/bin/prom2json http://127.0.0.1:2379/metrics",
+            "items": {
+               "etcd_grpc_proxy_cache_hits_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_grpc_proxy_cache_misses_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_grpc_proxy_events_coalescing_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_grpc_proxy_watchers_coalescing_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_network_client_grpc_received_bytes_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_network_client_grpc_sent_bytes_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_network_peer_received_bytes_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_network_peer_sent_bytes_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_server_has_leader":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_server_leader_changes_seen_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_server_proposals_applied_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_server_proposals_committed_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_server_proposals_failed_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "etcd_server_proposals_pending":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "http_requests_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "process_cpu_seconds_total":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "process_max_fds":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "process_open_fds":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "process_resident_memory_bytes":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "process_start_time_seconds":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          },
+               "process_virtual_memory_bytes":{
+                              "unit": "",
+                              "value_type": "int",
+                              "statistics_type": "latest",
+                              "scale_factor_when_display": 0.001
+                          }
+            },
+            "groups": {
+                "etcd": ["etcd_server_has_leader","etcd_network_peer_sent_bytes_total","etcd_grpc_proxy_watchers_coalescing_total"],
+                "process": ["process_cpu_seconds_total","process_resident_memory_bytes","process_virtual_memory_bytes","http_requests_total"]
+            },
+            "display": ["etcd", "process"],
+            "alarm": ["etcd_server_has_leader"]
+        }
+    }],
+    "advanced_actions": [ "scale_horizontal"],
+    "endpoints": {
+        "client": {
+            "port": 2379,
+            "protocol": "http"
+        }
+    }
+}

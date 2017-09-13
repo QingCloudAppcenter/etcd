@@ -14,12 +14,19 @@
     mode: 0644
     backup: yes
 
-- name: reload etcd service
+- name: load startup script
   become: yes
   become_user: root
   with_items:
-    - etcd.service
-    - etcd-grpc-proxy.service
-    - etcd-proxy.service
-  service:
-    name: '{{item}}'
+    - join.sh
+    - leave.sh
+    - start.sh
+    - stop.sh
+    - compact.sh
+  copy:
+    src: files/script/{{item}}
+    dest: /usr/local/bin/{{item}}
+    owner: root
+    group: root
+    mode: 0755
+    backup: yes

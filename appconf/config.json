@@ -1,0 +1,181 @@
+{
+    "type": "array",
+    "properties": [{
+        "key": "cluster",
+        "description": "clusterDescription",
+        "type": "array",
+        "properties": [{
+            "key": "name",
+            "label": "name",
+            "description": "etcdAppName",
+            "type": "string",
+            "default": "Etcd",
+            "required": "no"
+        }, {
+            "key": "description",
+            "label": "description",
+            "description": "etcdserviceDiscription",
+            "type": "string",
+            "default": "",
+            "required": "no"
+        }, {
+            "key": "vxnet",
+            "label": "VxNet",
+            "description": "choosevxnet",
+            "type": "string",
+            "default": "",
+            "required": "yes"
+        }, {
+          "key": "etcd_node",
+          "description": "role-based node properties",
+          "label": "etcdnode",
+          "type": "array",
+          "properties": [
+            {
+              "key": "cpu",
+              "label": "CPU",
+              "description": "cpuno",
+              "type": "integer",
+              "default": 2,
+              "range": [
+                1,
+                2,
+                4,
+                8,
+                16
+              ],
+              "required": "yes"
+            },
+            {
+              "key": "memory",
+              "label": "Memory",
+              "description": "memno",
+              "type": "integer",
+              "default": 8192,
+              "range": [
+                1024,
+                2048,
+                4096,
+                8192,
+                16384,
+                32768,
+                65536
+              ],
+              "required": "yes"
+            },
+            {
+              "key": "count",
+              "label": "Count",
+              "description": "nodeno",
+              "type": "integer",
+              "default": 3,
+              "max": 7,
+              "min": 3,
+              "required": "yes"
+            },{
+                "key": "instance_class",
+                "label": "InstanceClassLabel",
+                "description": "InstanceClassDescrip",
+                "type": "integer",
+                "default": 1,
+                "range": [0, 1],
+                "required": "yes"
+            },
+            {
+                "key": "volume_class",
+                "label": "VolumeClasslabel",
+                "description": "VolumeClassDes",
+                "type": "integer",
+                "default": 3,
+                "range": [0, 3],
+                "required": "yes"
+            },
+            {
+              "key": "volume_size",
+              "label": "VolumeSizelabel",
+              "description": "volumesize",
+              "type": "integer",
+              "default": 10,
+              "min": 10,
+              "max": 20,
+              "step": 1,
+              "required": "yes"
+            }]
+        },{
+          "key": "etcd_proxy",
+          "description": "role-based node properties",
+          "label": "etcdproxy",
+          "type": "array",
+          "properties": [
+            {
+              "key": "cpu",
+              "label": "CPU",
+              "description": "cpuno",
+              "type": "integer",
+              "default": 1,
+              "range": [
+                1,
+                2,
+                4,
+                8,
+                16
+              ],
+              "required": "yes"
+            },
+            {
+              "key": "memory",
+              "label": "Memory",
+              "description": "memno",
+              "type": "integer",
+              "default": 2048,
+              "range": [
+                1024,
+                2048,
+                4096,
+                8192,
+                16384,
+                32768,
+                65536
+              ],
+              "required": "yes"
+            },
+            {
+              "key": "count",
+              "label": "Count",
+              "description": "nodeno",
+              "type": "integer",
+              "default": 0,
+              "max": 100,
+              "min": 0,
+              "required": "no"
+            },{
+                "key": "instance_class",
+                "label": "InstanceClassLabel",
+                "description": "InstanceClassDescrip",
+                "type": "integer",
+                "default": 1,
+                "range": [0, 1],
+                "required": "yes"
+            }]
+          }]
+    },{
+        "key": "env",
+        "description": "application configuration properties",
+        "type": "array",
+        "properties": [{
+              "key": "etcd_node",
+              "description": "The role configuration properties of the application",
+              "type": "array",
+              "properties": [{
+                "key": "autocompact",
+                "label": "etcautocompact",
+                "description": "etcdautocompactdescrip",
+                "type": "integer",
+                "changeable": false,
+                "default": 0,
+                "min": 0,
+                "required": "yes"
+              }]
+          }]
+        }]
+}

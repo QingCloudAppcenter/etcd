@@ -2,4 +2,4 @@
 
 source /etc/etcd/etcd.conf
 
-systemctl start etcd
+systemctl stop etcd

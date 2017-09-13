@@ -2,4 +2,6 @@
 
 source /etc/etcd/etcd.conf
 
-systemctl start etcd
+ETCDCTL_API=3
+
+etcdctl compaction
