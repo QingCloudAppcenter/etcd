@@ -8,9 +8,9 @@ Wants=network-online.target
 Type=notify
 WorkingDirectory=/var/lib/etcd/
 EnvironmentFile=-/etc/etcd/etcd.conf
-User=etcd
+User=root
 # set GOMAXPROCS to number of processors
-ExecStart=/bin/bash -c "ETCD_NAME=etcd-$UNIQUESID if [[ -d $ETCD_DATA_DIR ]]; then  ETCD_INITIAL_CLUSTER_STATE=old; else ETCD_INITIAL_CLUSTER_STATE=new; fi GOMAXPROCS=$(nproc) /usr/local/bin/etcd --name=\"${ETCD_NAME}\" --data-dir=\"${ETCD_DATA_DIR}\" --listen-client-urls=\"${ETCD_LISTEN_CLIENT_URLS}\""
+ExecStart=/bin/bash -c "/usr/local/bin/etcd --name=etcd$UNIQUESID"
 Restart=on-failure
 LimitNOFILE=65536
 

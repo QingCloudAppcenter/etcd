@@ -2,7 +2,7 @@
 UNIQUESID={{getv "/host/sid"}}
 ETCD_DATA_DIR="/var/lib/etcd/default.etcd"
 
-ETCD_LISTEN_PEER_URLS="http://{{getv "/host/ip"}}:2380"
+ETCD_LISTEN_PEER_URLS="http://0.0.0.0:2380"
 ETCD_LISTEN_CLIENT_URLS="http://0.0.0.0:2379"
 #
 #[cluster]
@@ -35,3 +35,13 @@ ETCD_INITIAL_CLUSTER_TOKEN="{{getv "/cluster/cluster_id"}}"
 #ETCD_DEBUG="false"
 # examples for -log-package-levels etcdserver=WARNING,security=DEBUG
 #ETCD_LOG_PACKAGE_LEVELS=""
+
+if [[ -d $ETCD_DATA_DIR ]]
+then
+ETCD_INITIAL_CLUSTER_STATE=old
+else
+ETCD_INITIAL_CLUSTER_STATE=new
+fi
+
+
+ETCDCTL_ENDPOINTS={{range $index,$dir := lsdir "/hosts/etcd_node"}}{{$sid := printf "/hosts/etcd_node/%s/sid" $dir}}{{$ip := printf "/hosts/etcd_node/%s/ip" $dir}}{{if $index}},http://{{getv $ip}}:2379{{else}}http://{{getv $ip}}:2379{{end}}{{end}}

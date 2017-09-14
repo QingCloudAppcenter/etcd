@@ -1,4 +1,15 @@
 ---
+- name: Create config dir
+  become: yes
+  become_user: root
+  with_items:
+    - /etc/etcd/
+    - /var/lib/etcd/
+  file:
+    path: "{{item}}"
+    state: directory
+    mode: 0755
+
 - name: Setup etcd service def
   become: yes
   become_user: root
@@ -14,11 +25,17 @@
     mode: 0644
     backup: yes
 
+- name: sync confd config
+  synchronize:
+    src: files/confd/
+    dest: /etc/confd/
+    checksum: yes
+    times: no
+
 - name: load startup script
   become: yes
   become_user: root
   with_items:
-    - join.sh
     - leave.sh
     - start.sh
     - stop.sh

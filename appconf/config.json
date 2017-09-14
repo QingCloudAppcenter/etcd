@@ -77,7 +77,7 @@
                 "label": "InstanceClassLabel",
                 "description": "InstanceClassDescrip",
                 "type": "integer",
-                "default": 1,
+                "default": 0,
                 "range": [0, 1],
                 "required": "yes"
             },
@@ -86,7 +86,7 @@
                 "label": "VolumeClasslabel",
                 "description": "VolumeClassDes",
                 "type": "integer",
-                "default": 3,
+                "default": 0,
                 "range": [0, 3],
                 "required": "yes"
             },

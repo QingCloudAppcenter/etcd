@@ -8,7 +8,7 @@ Wants=network-online.target
 Type=notify
 WorkingDirectory=/var/lib/etcd/
 EnvironmentFile=-/etc/etcd/etcd.conf
-User=etcd
+User=root
 # set GOMAXPROCS to number of processors
 ExecStart=/bin/bash -c "ETCD_NAME=etcd-proxy$UNIQUESID GOMAXPROCS=$(nproc) /usr/local/bin/etcd gateway start --listen-client-urls=\"${ETCD_LISTEN_CLIENT_URLS}\""
 Restart=on-failure
