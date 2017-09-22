@@ -10,7 +10,9 @@ WorkingDirectory=/var/lib/etcd/
 EnvironmentFile=-/etc/etcd/etcd.conf
 User=root
 # set GOMAXPROCS to number of processors
-ExecStart=/usr/local/bin/run.sh
+ExecStartPre=/usr/local/bin/join.sh
+ExecStart=/bin/bash -c "ETCD_NAME=etcd$UNIQUESID /usr/local/bin/etcd"
+ExecStartPost=/usr/local/bin/post_run.sh
 Restart=on-failure
 LimitNOFILE=65536
 NotifyAccess=all

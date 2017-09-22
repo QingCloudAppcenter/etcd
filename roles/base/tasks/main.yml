@@ -1,16 +1,26 @@
 ---
+- name: install essential pkgs
+  become: yes
+  become_user: root
+  with_items:
+    - epel-release
+
+  yum:
+    name: '{{item}}'
+    state: present
 
 - name: upgrade all packages
   yum:
     name: '*'
     state: latest
 
-- name: install essential pkgs
+- name: install utils pkgs
   become: yes
   become_user: root
   with_items:
     - yum-updateonboot
     - yum-cron
+    - jq
     - ntp
     - bash
   yum:

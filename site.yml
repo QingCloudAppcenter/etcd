@@ -8,4 +8,4 @@
     - appcenter-agent
     - andrewrothstein.etcd
     - etcd-service
-    - coredns
+#    - coredns

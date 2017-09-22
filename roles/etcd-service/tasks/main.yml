@@ -37,9 +37,9 @@
   become_user: root
   with_items:
     - leave.sh
-    - run.sh
     - join.sh
     - compact.sh
+    - post_run.sh
   copy:
     src: files/script/{{item}}
     dest: /usr/local/bin/{{item}}
