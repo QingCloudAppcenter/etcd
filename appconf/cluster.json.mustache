@@ -7,7 +7,7 @@
         "container": {
             "type": "lxc",
             "zone": "pek3a",
-            "image": "img-c1tbhzaa"
+            "image": "img-kqpqb055"
         },
         "count": {{cluster.etcd_node.count}},
         "instance_class": {{cluster.etcd_node.instance_class}},
@@ -25,11 +25,11 @@
         "vertical_scaling_policy": "parallel",
         "services": {
             "start": {
-                "cmd": "/usr/local/bin/start.sh",
+                "cmd": "systemctl start etcd",
                 "timeout": 86400
             },
             "stop": {
-                "cmd": "/usr/local/bin/stop.sh"
+                "cmd": "systemctl stop etcd"
             },
             "destroy": {
               "cmd": "/usr/local/bin/leave.sh"
@@ -196,7 +196,7 @@
         "container": {
             "type": "lxc",
             "zone": "pek3a",
-            "image": "img-c1tbhzaa"
+            "image": "img-kqpqb055"
         },
         "count": {{cluster.etcd_proxy.count}},
         "instance_class": {{cluster.etcd_proxy.instance_class}},

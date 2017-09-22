@@ -1,0 +1,19 @@
+---
+- name: download coredns
+  become: yes
+  become_user: root
+  get_url:
+    url: '{{coredns_tgz_url}}'
+    dest: /tmp/{{coredns_tgz}}
+    checksum: '{{coredns_checksum}}'
+    timeout: '{{coredns_download_timeout_seconds}}'
+    mode: 0644
+
+- name: unachive coredns
+  become: yes
+  become_user: root
+  unarchive:
+    remote_src: yes
+    src: /tmp/{{coredns_tgz}}
+    dest: '{{coredns_install_dir}}'
+    creates: '{{coredns_install_dir}}/{{coredns_name}}'

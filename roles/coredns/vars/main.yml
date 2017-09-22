@@ -1,0 +1,7 @@
+---
+coredns_name : coredns_{{coredns_version}}_{{coredns_platform}}
+coredns_tgz : '{{coredns_name}}.tgz'
+
+# https://github.com/coredns/coredns/releases/download/v011/coredns_011_linux_amd64.tgz
+coredns_tgz_url : '{{coredns_mirror}}/v{{coredns_version}}/{{coredns_tgz}}'
+coredns_checksum: '{{coredns_checksums[coredns_platform]}}'

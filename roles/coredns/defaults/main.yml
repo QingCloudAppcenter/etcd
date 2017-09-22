@@ -1,0 +1,10 @@
+---
+coredns_version: "011"
+coredns_platform: linux_x86_64
+coredns_mirror: https://github.com/coredns/coredns/releases/download
+coredns_install_dir: /usr/local/bin
+
+coredns_checksums:
+  linux_x86_64: sha256:839ad1ae3e0a15ab39e49972355f7ae64b0804c2b497bd16ad59da975a8e6baf
+
+coredns_download_timeout_seconds: 600

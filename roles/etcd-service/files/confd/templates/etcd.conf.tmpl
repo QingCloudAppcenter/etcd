@@ -38,7 +38,7 @@ ETCD_INITIAL_CLUSTER_TOKEN="{{getv "/cluster/cluster_id"}}"
 
 if [[ -d $ETCD_DATA_DIR ]]
 then
-ETCD_INITIAL_CLUSTER_STATE=old
+ETCD_INITIAL_CLUSTER_STATE=existing
 else
 ETCD_INITIAL_CLUSTER_STATE=new
 fi
