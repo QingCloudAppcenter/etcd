@@ -7,7 +7,6 @@ ETCD_LISTEN_CLIENT_URLS="http://0.0.0.0:2379"
 #
 #[cluster]
 ETCD_INITIAL_ADVERTISE_PEER_URLS="http://{{getv "/host/ip"}}:2380"
-ETCD_INITIAL_CLUSTER='{{range $index,$dir := lsdir "/hosts/etcd_node"}}{{$sid := printf "/hosts/etcd_node/%s/sid" $dir}}{{$ip := printf "/hosts/etcd_node/%s/ip" $dir}}{{if $index}},etcd{{getv $sid}}=http://{{getv $ip}}:2380{{else}}etcd{{getv $sid}}=http://{{getv $ip}}:2380{{end}}{{end}}'
 ETCD_ADVERTISE_CLIENT_URLS="http://{{getv "/host/ip"}}:2379"
 ETCD_QUOTA_BACKEND_BYTES=8589934592
 ETCD_AUTO_COMPACTION_RETENTION={{getv "/env/etcautocompact"}}
@@ -36,12 +35,5 @@ ETCD_INITIAL_CLUSTER_TOKEN="{{getv "/cluster/cluster_id"}}"
 # examples for -log-package-levels etcdserver=WARNING,security=DEBUG
 #ETCD_LOG_PACKAGE_LEVELS=""
 
-if [[ -d $ETCD_DATA_DIR ]]
-then
-ETCD_INITIAL_CLUSTER_STATE=existing
-else
 ETCD_INITIAL_CLUSTER_STATE=new
-fi
-
-
 ETCDCTL_ENDPOINTS={{range $index,$dir := lsdir "/hosts/etcd_node"}}{{$sid := printf "/hosts/etcd_node/%s/sid" $dir}}{{$ip := printf "/hosts/etcd_node/%s/ip" $dir}}{{if $index}},http://{{getv $ip}}:2379{{else}}http://{{getv $ip}}:2379{{end}}{{end}}

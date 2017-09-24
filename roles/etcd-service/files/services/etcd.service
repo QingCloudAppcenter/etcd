@@ -8,6 +8,7 @@ Wants=network-online.target
 Type=notify
 WorkingDirectory=/var/lib/etcd/
 EnvironmentFile=-/etc/etcd/etcd.conf
+EnvironmentFile=-/etc/etcd/runtime_etcd.conf
 User=root
 # set GOMAXPROCS to number of processors
 ExecStartPre=/usr/local/bin/join.sh
