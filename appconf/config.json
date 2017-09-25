@@ -69,8 +69,7 @@
               "description": "nodeno",
               "type": "integer",
               "default": 3,
-              "max": 7,
-              "min": 3,
+              "range": [3, 5, 7],
               "required": "yes"
             },{
                 "key": "instance_class",
