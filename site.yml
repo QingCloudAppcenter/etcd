@@ -5,7 +5,7 @@
 
   roles:
     - base
-    - appcenter-agent
     - andrewrothstein.etcd
+    - appcenter-agent
     - etcd-service
-#    - coredns
+    - coredns

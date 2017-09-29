@@ -1,7 +1,7 @@
 ---
 coredns_version: "011"
 coredns_platform: linux_x86_64
-coredns_mirror: https://github.com/coredns/coredns/releases/download
+coredns_mirror: https://martin.pek3a.qingstor.com/coredns/v011/coredns_011_linux_x86_64.tgz
 coredns_install_dir: /usr/local/bin
 
 coredns_checksums:

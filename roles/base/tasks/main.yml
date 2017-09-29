@@ -20,7 +20,6 @@
   with_items:
     - yum-updateonboot
     - yum-cron
-    - jq
     - ntp
     - bash
   yum:

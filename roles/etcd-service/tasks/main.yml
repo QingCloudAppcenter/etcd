@@ -10,6 +10,15 @@
     state: directory
     mode: 0755
 
+- name: install utils pkgs
+  become: yes
+  become_user: root
+  with_items:
+    - jq
+  yum:
+    name: '{{item}}'
+    state: present
+
 - name: Setup etcd service def
   become: yes
   become_user: root
