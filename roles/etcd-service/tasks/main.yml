@@ -26,6 +26,7 @@
     - etcd.service
     - etcd-grpc-proxy.service
     - etcd-proxy.service
+    - etcd-status-guard.service
   copy:
     src: files/services/{{item}}
     dest: /etc/systemd/system/{{item}}

@@ -4,22 +4,39 @@
   become_user: root
   with_items:
     - epel-release
-
   yum:
     name: '{{item}}'
     state: present
+
+- name: install repo tool
+  become: yes
+  become_user: root
+  with_items:
+    - yum-plugin-fastestmirror
+  yum:
+    name: '{{item}}'
+    state: present
+
+- name: Enable apply fastest mirror
+  ini_file:
+    path: /etc/yum/pluginconf.d/fastestmirror.conf
+    section: main
+    option: enabled
+    value: 1
+    backup: yes
 
 - name: upgrade all packages
   yum:
     name: '*'
     state: latest
-
+    
 - name: install utils pkgs
   become: yes
   become_user: root
   with_items:
     - yum-updateonboot
     - yum-cron
+    - yum-plugin-fastestmirror
     - ntp
     - bash
   yum:

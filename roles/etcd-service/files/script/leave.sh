@@ -1,5 +1,4 @@
 #!/bin/bash
-systemctl stop etcd
 
 source /etc/etcd/etcd.conf
 
