@@ -29,7 +29,11 @@ then
   unset ETCD_INITIAL_CLUSTER
   ETCD_INITIAL_CLUSTER=$(ETCDCTL_API=3 etcdctl member list --endpoints=http://$etcd_endpoint:2379 |grep ' started' | awk -F \,  '{ gsub(/ /, "", $0);print $3"="$4 }'|{ while read node; do  if [[ -z $ETCD_INITIAL_CLUSTER ]]; then export ETCD_INITIAL_CLUSTER=$node; else export ETCD_INITIAL_CLUSTER=$ETCD_INITIAL_CLUSTER,$node; fi; done; echo $ETCD_INITIAL_CLUSTER; } )
   ETCDCTL_API=3 etcdctl member add etcd$UNIQUESID --peer-urls=$ETCD_INITIAL_ADVERTISE_PEER_URLS --endpoints=http://$etcd_endpoint:2379
-  echo "add member return code is " $?
+  if [[ $? -ne 0 ]]
+  then
+    systemd-notify --status="Failed to add member to etcd cluster"
+    return 1
+  fi
   echo ETCD_INITIAL_CLUSTER=$ETCD_INITIAL_CLUSTER,etcd$UNIQUESID=$ETCD_INITIAL_ADVERTISE_PEER_URLS >>  /etc/etcd/runtime_etcd.conf
   echo ETCD_INITIAL_CLUSTER_STATE=existing >> /etc/etcd/runtime_etcd.conf
   cat /etc/etcd/runtime_etcd.conf
