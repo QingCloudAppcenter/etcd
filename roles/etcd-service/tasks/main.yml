@@ -17,7 +17,7 @@
     - jq
   yum:
     name: '{{item}}'
-    state: present
+    state: latest
 
 - name: Setup etcd service def
   become: yes
@@ -50,6 +50,9 @@
     - join.sh
     - compact.sh
     - post_run.sh
+    - backup.sh
+    - restore.sh
+    - delete_backup.sh
   copy:
     src: files/script/{{item}}
     dest: /usr/local/bin/{{item}}

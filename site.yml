@@ -9,3 +9,4 @@
     - appcenter-agent
     - etcd-service
     - coredns
+    - monitor

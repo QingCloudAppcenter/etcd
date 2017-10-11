@@ -15,7 +15,7 @@
     - yum-plugin-fastestmirror
   yum:
     name: '{{item}}'
-    state: present
+    state: latest
 
 - name: Enable apply fastest mirror
   ini_file:
@@ -29,7 +29,7 @@
   yum:
     name: '*'
     state: latest
-    
+
 - name: install utils pkgs
   become: yes
   become_user: root
@@ -41,7 +41,7 @@
     - bash
   yum:
     name: '{{item}}'
-    state: present
+    state: latest
 
 - name: Enable apply updated packages
   ini_file:

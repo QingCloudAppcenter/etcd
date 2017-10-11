@@ -2,12 +2,14 @@
     "name": {{cluster.name}},
     "description": {{cluster.description}},
     "vxnet": {{cluster.vxnet}},
+    "incremental_backup_supported": true,
+    "backup_policy": "device",
     "nodes": [{
       "role": "etcd_node",
         "container": {
             "type": "lxc",
             "zone": "pek3a",
-            "image": "img-5zwctyih"
+            "image": "img-qao5y8tg"
         },
         "count": {{cluster.etcd_node.count}},
         "instance_class": {{cluster.etcd_node.instance_class}},
@@ -35,9 +37,19 @@
               "cmd": "/usr/local/bin/leave.sh"
             },
             "compact": {
+              "nodes_to_execute_on": 1,
               "type": "custom",
               "cmd": "/usr/local/bin/compact.sh",
               "timeout": 86400
+            },
+            "backup": {
+              "cmd": "/usr/local/bin/backup.sh"
+            },
+            "restore": {
+              "cmd": "/usr/local/bin/restore.sh;systemctl start etcd"
+            },
+            "delete_snapshot": {
+              "cmd": "/usr/local/bin/delete_backup.sh"
             }
         },
         "health_check": {
@@ -48,7 +60,7 @@
             "healthy_threshold": 3,
             "unhealthy_threshold": 3,
             "check_cmd": "curl http://127.0.0.1:2379/health",
-            "action_cmd": "/usr/local/bin/etcdmanager stop;/usr/local/bin/etcdmanager leave;sleep 5;kill -9 `pgrep etcd`;rm -rf /var/lib/etcd/*;/usr/local/bin/etcdmanager join"
+            "action_cmd": "systemctl restart etcd"
         },
           "env": {
                 "etcautocompact": {{env.etcd_node.autocompact}}
@@ -196,7 +208,7 @@
         "container": {
             "type": "lxc",
             "zone": "pek3a",
-            "image": "img-5zwctyih"
+            "image": "img-qao5y8tg"
         },
         "count": {{cluster.etcd_proxy.count}},
         "instance_class": {{cluster.etcd_proxy.instance_class}},

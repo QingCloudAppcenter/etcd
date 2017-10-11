@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Fan Shang Xiang
-  description: installs coredns
+  description: installs prometheus metrics client
   company: yunify
   license:
     - MIT
@@ -23,8 +23,8 @@ galaxy_info:
       versions:
         - all
   galaxy_tags:
-    - coredns
-    - dns
+    - etcd
+    - prometheus
 
 dependencies:
   - role: etcd-service
