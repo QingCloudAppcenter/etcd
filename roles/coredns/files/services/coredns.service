@@ -1,0 +1,19 @@
+[Unit]
+Description=CoreDNS DNS server
+Documentation=https://coredns.io
+After=network.target
+After=etcd-proxy.service
+Wants=etcd-proxy.target
+
+[Service]
+PermissionsStartOnly=true
+LimitNOFILE=65535
+User=coredns
+WorkingDirectory=/var/lib/etcd/coredns
+ExecStartPre=/sbin/setcap cap_net_bind_service=+ep /usr/local/bin/coredns
+ExecStart=/usr/local/bin/coredns -conf=/var/lib/etcd/coredns/Corefile
+ExecReload=/bin/kill -SIGUSR1 $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

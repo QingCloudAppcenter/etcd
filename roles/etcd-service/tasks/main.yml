@@ -5,6 +5,7 @@
   with_items:
     - /etc/etcd/
     - /var/lib/etcd/
+    - /var/lib/etcd/ETCD.BACKUP
   file:
     path: "{{item}}"
     state: directory
@@ -24,8 +25,6 @@
   become_user: root
   with_items:
     - etcd.service
-    - etcd-grpc-proxy.service
-    - etcd-proxy.service
     - etcd-status-guard.service
   copy:
     src: files/services/{{item}}

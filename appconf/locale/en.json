@@ -22,5 +22,7 @@
   "etcautocompact":"etcd autocompact",
   "etcdautocompactdescrip":"etcd autocompact, 0 for disable",
   "VolumeClassDes":"The volume type for the cluster to run，such as high performance，high performance plus",
-  "VolumeClasslabel":"Volume Class"
+  "VolumeClasslabel":"Volume Class",
+  "enableCorednsdescript":"Enable coredns server",
+  "enableCoredns":"Enable coredns server"
 }

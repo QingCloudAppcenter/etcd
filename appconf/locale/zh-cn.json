@@ -26,5 +26,7 @@
     "etcautocompact":"etcd autocompact",
     "etcdautocompactdescrip":"etcd 自动清除历史记录0为关闭",
     "VolumeClassDes":"硬盘类型，如性能型，超高性能型",
-    "VolumeClasslabel":"硬盘类型"
+    "VolumeClasslabel":"硬盘类型",
+    "enableCorednsdescript":"打开 coredns 服务",
+    "enableCoredns":"开启coredns"
 }

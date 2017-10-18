@@ -76,7 +76,7 @@
                 "label": "InstanceClassLabel",
                 "description": "InstanceClassDescrip",
                 "type": "integer",
-                "default": 0,
+                "default": 1,
                 "range": [0, 1],
                 "required": "yes"
             },
@@ -85,7 +85,7 @@
                 "label": "VolumeClasslabel",
                 "description": "VolumeClassDes",
                 "type": "integer",
-                "default": 0,
+                "default": 3,
                 "range": [0, 3],
                 "required": "yes"
             },
@@ -175,6 +175,35 @@
                 "min": 0,
                 "required": "yes"
               }]
-          }]
+          },{
+                "key": "etcd_proxy",
+                "description": "The role configuration properties of the application",
+                "type": "array",
+                "properties": [{
+                  "key": "enableCoredns",
+                  "label": "enableCoredns",
+                  "description": "enableCorednsdescript",
+                  "type": "boolean",
+                  "changeable": false,
+                  "default": false,
+                  "required": "yes"
+                },{
+                  "key": "corednszone",
+                  "label": "CoreDNSZoneName",
+                  "description": "CoreDNSZoneNameDescript",
+                  "type": "string",
+                  "changeable": false,
+                  "default": "skydns.cluster",
+                  "required": "no"
+                },{
+                  "key": "corednsetcdprefix",
+                  "label": "CoreDNSZoneEtcdPrefix",
+                  "description": "CoreDNSZoneEtcdPrefixDescript",
+                  "type": "string",
+                  "changeable": false,
+                  "default": "/skydns",
+                  "required": "no"
+                }]
+            }]
         }]
 }

@@ -1,4 +1,15 @@
 ---
+- name: Create config dir
+  become: yes
+  become_user: root
+  with_items:
+    - /var/lib/etcd/
+    - /var/lib/etcd/coredns/
+  file:
+    path: "{{item}}"
+    state: directory
+    mode: 0755
+
 - name: download coredns
   become: yes
   become_user: root
@@ -17,3 +28,32 @@
     src: /tmp/{{coredns_tgz}}
     dest: '{{coredns_install_dir}}'
     creates: '{{coredns_install_dir}}/{{coredns_name}}'
+
+- name: Setup etcd service def
+  become: yes
+  become_user: root
+  with_items:
+    - coredns.service
+  copy:
+    src: files/services/{{item}}
+    dest: /etc/systemd/system/{{item}}
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+
+- name: sync confd config
+  synchronize:
+    src: files/confd/
+    dest: /etc/confd/
+    checksum: yes
+    times: no
+
+- name: install utils pkgs
+  become: yes
+  become_user: root
+  with_items:
+    - bind-utils
+  yum:
+    name: '{{item}}'
+    state: latest

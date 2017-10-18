@@ -1,5 +1,5 @@
 [Unit]
-Description=Etcd grpc proxy Server
+Description=Etcd proxy Server
 After=network.target
 After=network-online.target
 Wants=network-online.target
@@ -7,10 +7,10 @@ Wants=network-online.target
 [Service]
 Type=notify
 WorkingDirectory=/var/lib/etcd/
-EnvironmentFile=-/etc/etcd/etcd.conf
+EnvironmentFile=-/etc/etcd/etcd_proxy.conf
 User=root
 # set GOMAXPROCS to number of processors
-ExecStart=/bin/bash -c "ETCD_NAME=etcd-proxy$UNIQUESID GOMAXPROCS=$(nproc) /usr/local/bin/etcd grpc-proxy start --listen-client-urls=\"${ETCD_LISTEN_CLIENT_URLS}\""
+ExecStart=/bin/bash -c "ETCD_NAME=etcd-proxy$UNIQUESID /usr/local/bin/etcd gateway start --endpoints=$ETCD_ENDPOINTS --listen-addr=$ETCD_LISTEN_ADDR"
 Restart=on-failure
 LimitNOFILE=65536
 

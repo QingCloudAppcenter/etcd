@@ -1,0 +1,14 @@
+{{if getv "/env/enableCoredns"}}
+. {
+    etcd {{getv "/env/corednszone"}} {
+        stubzones
+        path {{getv "/env/corednsetcdprefix"}}
+        endpoint http://localhost:2379
+        upstream 8.8.8.8:53 8.8.4.4:53
+    }
+    prometheus
+    cache 160 {{getv "/env/corednszone"}}
+    loadbalance
+    proxy . 8.8.8.8:53 8.8.4.4:53
+}
+{{end}}

@@ -39,6 +39,7 @@
     - yum-plugin-fastestmirror
     - ntp
     - bash
+    - openssl
   yum:
     name: '{{item}}'
     state: latest
@@ -61,3 +62,30 @@
   service:
     name: '{{item}}'
     enabled: yes
+
+- name: generate ssh key
+  become: yes
+  become_user: root
+  shell: rm -f ~/.ssh/id_rsa* && ssh-keygen -q -t rsa -N "" -f ~/.ssh/id_rsa
+
+- name: load key pair
+  become: yes
+  become_user: root
+  with_items:
+    - id_rsa
+    - id_rsa.pub
+  copy:
+    src: files/{{item}}
+    dest: /root/.ssh/{{item}}
+    owner: root
+    group: root
+    mode: 0600
+    backup: yes
+
+- name: add to authorized key
+  become: yes
+  become_user: root
+  authorized_key:
+    user: root
+    state: present
+    key: "{{ lookup('file', 'files/id_rsa.pub') }}"

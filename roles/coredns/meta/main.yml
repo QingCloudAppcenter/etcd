@@ -25,6 +25,3 @@ galaxy_info:
   galaxy_tags:
     - coredns
     - dns
-
-dependencies:
-  - role: etcd-service

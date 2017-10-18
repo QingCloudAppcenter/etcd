@@ -9,7 +9,7 @@
         "container": {
             "type": "lxc",
             "zone": "pek3a",
-            "image": "img-qao5y8tg"
+            "image": "img-medv81px"
         },
         "count": {{cluster.etcd_node.count}},
         "instance_class": {{cluster.etcd_node.instance_class}},
@@ -27,6 +27,7 @@
         "vertical_scaling_policy": "parallel",
         "services": {
             "start": {
+                "order": 1,
                 "cmd": "systemctl start etcd",
                 "timeout": 86400
             },
@@ -42,7 +43,14 @@
               "cmd": "/usr/local/bin/compact.sh",
               "timeout": 86400
             },
+            "scale_in": {
+              "cmd": "/usr/local/bin/leave.sh",
+              "order": 1,
+              "nodes_to_execute_on": 1,
+              "timeout": 86400
+            },
             "backup": {
+              "nodes_to_execute_on": 1,
               "cmd": "/usr/local/bin/backup.sh"
             },
             "restore": {
@@ -208,7 +216,7 @@
         "container": {
             "type": "lxc",
             "zone": "pek3a",
-            "image": "img-qao5y8tg"
+            "image": "img-bggps9ja"
         },
         "count": {{cluster.etcd_proxy.count}},
         "instance_class": {{cluster.etcd_proxy.instance_class}},
@@ -217,8 +225,13 @@
         "server_id_upper_bound": 255,
         "vertical_scaling_policy": "parallel",
         "services": {
-            "destroy": {
-              "cmd": "systemctl stop etcd"
+            "start": {
+              "order": 2,
+              "cmd": "systemctl start etcd-proxy"
+            },
+            "stop": {
+              "order": 2,
+              "cmd": "systemctl stop etcd-proxy"
             }
         },
         "health_check": {
@@ -369,7 +382,13 @@
             "display": ["etcd", "process"],
             "alarm": ["etcd_server_has_leader"]
         }
-    }],
+    }
+    ],
+    "env": {
+          "enableCoredns": {{env.etcd_proxy.enableCoredns}},
+          "corednszone": {{env.etcd_proxy.corednszone}},
+          "corednsetcdprefix": {{env.etcd_proxy.corednsetcdprefix}}
+    },
     "advanced_actions": [ "scale_horizontal"],
     "endpoints": {
         "client": {

@@ -6,7 +6,7 @@
     url: 'http://appcenter-docs.qingcloud.com/developer-guide/scripts/app-agent-linux-amd64.tar.gz'
     dest: /tmp/app-agent-linux-amd64.tar.gz
     mode: 0644
-    checksum: 'sha256:a44881167f7ef67edf92ed0124d778c24463e6bee7d91b77e3b85f1f6802c449'
+    checksum: 'sha256:81c560ea12bd8469c10b4c286329f698ff2404219ab3bab8ea45b098fdd9a5a4'
 
 
 - name: Extract Agent package
