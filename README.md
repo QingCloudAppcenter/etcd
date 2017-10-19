@@ -4,6 +4,9 @@
 1. run ansible commands
 
   ``` shell
-  ansible-galaxy install andrewrothstein.etcd
   ansible-playbook -i hosts site.yml
   ```
+
+1. shutdown instance and create image
+1. update imageid in cluster.json.mustache
+1. upload configuration

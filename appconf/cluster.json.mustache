@@ -232,7 +232,15 @@
             "stop": {
               "order": 2,
               "cmd": "systemctl stop etcd-proxy"
-            }
+            },           
+            "scale_in": {
+              "order": 2,
+              "cmd": "systemctl restart etcd-proxy"
+            },
+            "scale_out": {
+              "order": 2,
+              "cmd": "systemctl restart etcd-proxy"
+            },
         },
         "health_check": {
             "enable": true,

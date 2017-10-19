@@ -1,11 +1,11 @@
 ---
 - name: Setup etcd cluster
-  hosts: etcd_node,etcd_proxy
+  hosts: all
   remote_user: root
   roles:
     - base
-    - andrewrothstein.etcd
     - appcenter-agent
+    - andrewrothstein.etcd
     - monitor
 
 - name: Setup etcd node
@@ -17,14 +17,6 @@
 - name: Setup etcd proxy node
   hosts: etcd_proxy
   remote_user: root
-  roles:
+  roles:     
     - etcd-proxy
     - coredns
-
-- name: Setup coredns node
-  hosts: coredns
-  remote_user: root
-  roles:
-    - base
-    - coredns
-    - monitor
