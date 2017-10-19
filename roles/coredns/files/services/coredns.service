@@ -6,14 +6,13 @@ After=etcd-proxy.service
 Wants=etcd-proxy.target
 
 [Service]
-PermissionsStartOnly=true
-LimitNOFILE=65535
-User=coredns
+Type=simple
 WorkingDirectory=/var/lib/etcd/coredns
-ExecStartPre=/sbin/setcap cap_net_bind_service=+ep /usr/local/bin/coredns
+User=root
 ExecStart=/usr/local/bin/coredns -conf=/var/lib/etcd/coredns/Corefile
 ExecReload=/bin/kill -SIGUSR1 $MAINPID
 Restart=on-failure
+LimitNOFILE=65536
 
 [Install]
 WantedBy=multi-user.target

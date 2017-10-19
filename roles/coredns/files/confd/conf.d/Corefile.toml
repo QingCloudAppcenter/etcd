@@ -4,4 +4,3 @@ dest = "/var/lib/etcd/coredns/Corefile"
   keys = [
     "/",
 ]
-reload_cmd = "systemctl restart coredns"

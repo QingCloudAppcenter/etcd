@@ -32,6 +32,15 @@
           "type": "array",
           "properties": [
             {
+                "key": "loadbalancer",
+                "label": "etcdnodelb",
+                "description": "etcdnodelbdescript",
+                "type": "loadbalancer",
+                "port": 2379,
+                "default": [],
+                "required": "no"
+            },
+            {
               "key": "cpu",
               "label": "CPU",
               "description": "cpuno",

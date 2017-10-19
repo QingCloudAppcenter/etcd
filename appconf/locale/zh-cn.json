@@ -28,5 +28,13 @@
     "VolumeClassDes":"硬盘类型，如性能型，超高性能型",
     "VolumeClasslabel":"硬盘类型",
     "enableCorednsdescript":"打开 coredns 服务",
-    "enableCoredns":"开启coredns"
+    "enableCoredns":"开启coredns",
+    "CoreDNSZoneName":"DNS服务根域名",
+    "CoreDNSZoneNameDescript":"DNS服务的根域名，所有查询都会以这个域名为后缀。",
+    "CoreDNSZoneEtcdPrefix":"服务信息在etcd中的前缀",
+    "CoreDNSZoneEtcdPrefixDescript":"服务信息在etcd中存储的前缀。coredns会读取这个前缀下的内容生成域名信息",
+    "etcdnodelb":"etcd负载均衡器",
+    "etcdnodelbdescript":"etcd服务的负载均衡器,端口为2379",
+    "corednslb":"coredns负载均衡器",
+    "corednslbdescript":"给coredns服务的负载均衡器，端口为53"
 }

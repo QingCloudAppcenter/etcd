@@ -10,5 +10,6 @@
     cache 160 {{getv "/env/corednszone"}}
     loadbalance
     proxy . 8.8.8.8:53 8.8.4.4:53
+    whoami
 }
 {{end}}

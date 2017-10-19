@@ -9,8 +9,9 @@
         "container": {
             "type": "lxc",
             "zone": "pek3a",
-            "image": "img-medv81px"
+            "image": "img-ycml0sju"
         },
+        "loadbalancer": {{cluster.etcd_node.loadbalancer}},
         "count": {{cluster.etcd_node.count}},
         "instance_class": {{cluster.etcd_node.instance_class}},
         "cpu": {{cluster.etcd_node.cpu}},
@@ -48,6 +49,10 @@
               "order": 1,
               "nodes_to_execute_on": 1,
               "timeout": 86400
+            },
+            "scale_out": {
+              "order": 1,
+              "cmd": "echo TEST"
             },
             "backup": {
               "nodes_to_execute_on": 1,
@@ -216,7 +221,7 @@
         "container": {
             "type": "lxc",
             "zone": "pek3a",
-            "image": "img-bggps9ja"
+            "image": "img-xznk20m7"
         },
         "count": {{cluster.etcd_proxy.count}},
         "instance_class": {{cluster.etcd_proxy.instance_class}},
@@ -227,20 +232,20 @@
         "services": {
             "start": {
               "order": 2,
-              "cmd": "systemctl start etcd-proxy"
+              "cmd": "systemctl start etcd-proxy;/usr/local/bin/restart_coredns.sh"
             },
             "stop": {
               "order": 2,
-              "cmd": "systemctl stop etcd-proxy"
-            },           
+              "cmd": "systemctl stop etcd-proxy;systemctl stop coredns"
+            },
             "scale_in": {
               "order": 2,
-              "cmd": "systemctl restart etcd-proxy"
+              "cmd": "systemctl restart etcd-proxy;/usr/local/bin/restart_coredns.sh"
             },
             "scale_out": {
               "order": 2,
-              "cmd": "systemctl restart etcd-proxy"
-            },
+              "cmd": "systemctl restart etcd-proxy;/usr/local/bin/restart_coredns.sh"
+            }
         },
         "health_check": {
             "enable": true,
@@ -399,9 +404,12 @@
     },
     "advanced_actions": [ "scale_horizontal"],
     "endpoints": {
-        "client": {
-            "port": 2379,
-            "protocol": "http"
-        }
+            "client": {
+                "port": 2379,
+                "protocol": "http"
+            },
+            "dns": {
+                "port": 53
+            }
     }
 }

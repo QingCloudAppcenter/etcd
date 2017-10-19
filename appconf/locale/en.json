@@ -24,5 +24,13 @@
   "VolumeClassDes":"The volume type for the cluster to run，such as high performance，high performance plus",
   "VolumeClasslabel":"Volume Class",
   "enableCorednsdescript":"Enable coredns server",
-  "enableCoredns":"Enable coredns server"
+  "enableCoredns":"Enable coredns server",
+  "CoreDNSZoneName":"Root Zone Name",
+  "CoreDNSZoneNameDescript":"Root Zone Name of coredns server",
+  "CoreDNSZoneEtcdPrefix":"etcd prefix of service info",
+  "CoreDNSZoneEtcdPrefixDescript":"coredns will read through all of keys under this prefix and generate service info",
+  "etcdnodelb":"LB for etcd",
+  "etcdnodelbdescript":"load balancer for etcd service",
+  "corednslb":"LB for coredns",
+  "corednslbdescript":"Load balancer for coredns service"
 }

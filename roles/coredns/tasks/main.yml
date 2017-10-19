@@ -57,3 +57,16 @@
   yum:
     name: '{{item}}'
     state: latest
+
+- name: load startup script
+  become: yes
+  become_user: root
+  with_items:
+    - restart_coredns.sh
+  copy:
+    src: files/scripts/{{item}}
+    dest: /usr/local/bin/{{item}}
+    owner: root
+    group: root
+    mode: 0755
+    backup: yes

@@ -9,7 +9,6 @@ Type=notify
 WorkingDirectory=/var/lib/etcd/
 EnvironmentFile=-/etc/etcd/etcd_proxy.conf
 User=root
-# set GOMAXPROCS to number of processors
 ExecStart=/bin/bash -c "ETCD_NAME=etcd-proxy$UNIQUESID /usr/local/bin/etcd gateway start --endpoints=$ETCD_ENDPOINTS --listen-addr=$ETCD_LISTEN_ADDR"
 Restart=on-failure
 LimitNOFILE=65536
