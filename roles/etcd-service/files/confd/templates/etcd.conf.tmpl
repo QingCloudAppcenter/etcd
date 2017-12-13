@@ -1,0 +1,51 @@
+# [member]
+UNIQUESID={{getv "/host/sid"}}
+ETCD_DATA_DIR="/data/default.etcd"
+ETCD_BACKUP_DIR="/data/ETCD.BACKUP"
+ETCD_LISTEN_PEER_URLS="http://0.0.0.0:2380"
+ETCD_LISTEN_CLIENT_URLS="http://0.0.0.0:2379"
+#
+#[cluster]
+ETCD_INITIAL_ADVERTISE_PEER_URLS="http://{{getv "/host/ip"}}:2380"
+ETCD_INITIAL_CLUSTER='{{range $index,$dir := lsdir "/hosts/etcd_node"}}{{$sid := printf "/hosts/etcd_node/%s/sid" $dir}}{{$ip := printf "/hosts/etcd_node/%s/ip" $dir}}{{if $index}},etcd{{getv $sid}}=http://{{getv $ip}}:2380{{else}}etcd{{getv $sid}}=http://{{getv $ip}}:2380{{end}}{{end}}'
+ETCD_ADVERTISE_CLIENT_URLS="http://{{getv "/host/ip"}}:2379"
+ETCD_QUOTA_BACKEND_BYTES=8589934592
+ETCD_AUTO_COMPACTION_RETENTION={{getv "/env/etcautocompact"}}
+ETCD_INITIAL_CLUSTER_TOKEN="{{getv "/cluster/cluster_id"}}"
+
+#
+#[proxy]
+#ETCD_PROXY_FAILURE_WAIT="5000"
+#ETCD_PROXY_REFRESH_INTERVAL="30000"
+#ETCD_PROXY_DIAL_TIMEOUT="1000"
+#ETCD_PROXY_WRITE_TIMEOUT="5000"
+#ETCD_PROXY_READ_TIMEOUT="0"
+#
+#[security]
+#ETCD_CERT_FILE=""
+#ETCD_KEY_FILE=""
+#ETCD_CLIENT_CERT_AUTH="false"
+#ETCD_TRUSTED_CA_FILE=""
+#ETCD_PEER_CERT_FILE=""
+#ETCD_PEER_KEY_FILE=""
+#ETCD_PEER_CLIENT_CERT_AUTH="false"
+#ETCD_PEER_TRUSTED_CA_FILE=""
+#
+#[logging]
+#ETCD_DEBUG="false"
+# examples for -log-package-levels etcdserver=WARNING,security=DEBUG
+#ETCD_LOG_PACKAGE_LEVELS=""
+
+ETCD_INITIAL_CLUSTER_STATE=new
+ETCDCTL_ENDPOINTS={{range $index,$dir := lsdir "/hosts/etcd_node"}}{{$sid := printf "/hosts/etcd_node/%s/sid" $dir}}{{$ip := printf "/hosts/etcd_node/%s/ip" $dir}}{{if $index}},http://{{getv $ip}}:2379{{else}}http://{{getv $ip}}:2379{{end}}{{end}}
+{{$newhosts := lsdir "/adding-hosts/etcd_node"}}ADDING_HOST_NUM={{len $newhosts}}
+
+{{$hosts := lsdir "/hosts/etcd_node"}}{{range $index,$host:= $hosts}}{{$ip := printf "/hosts/etcd_node/%s/ip" $host}}
+HOST_{{$index}}={{getv $ip}}{{end}}
+HOST_NUM={{len $hosts}}
+
+{{$delhosts := lsdir "/deleting-hosts/etcd_node"}}DELETING_HOST_NUM={{len $delhosts}}
+{{range $index,$host:= $delhosts}}{{$ip := printf "/hosts/etcd_node/%s/ip" $host}}
+DELETING_HOST_{{$index}}={{getv $ip}}{{end}}
+
+ROLE={{getv "/host/role"}}

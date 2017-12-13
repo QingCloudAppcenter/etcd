@@ -1,0 +1,6 @@
+[template]
+src = "etcd_proxy.conf.tmpl"
+dest = "/etc/etcd/etcd_proxy.conf"
+  keys = [
+    "/",
+]

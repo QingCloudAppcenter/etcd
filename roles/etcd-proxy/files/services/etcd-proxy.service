@@ -1,0 +1,17 @@
+[Unit]
+Description=Etcd proxy Server
+After=network.target
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+WorkingDirectory=/var/lib/etcd/
+EnvironmentFile=-/etc/etcd/etcd_proxy.conf
+User=root
+ExecStart=/bin/bash -c "ETCD_NAME=etcd-proxy$UNIQUESID /usr/local/bin/etcd gateway start --endpoints=$ETCD_ENDPOINTS --listen-addr=$ETCD_LISTEN_ADDR"
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

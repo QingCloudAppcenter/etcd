@@ -1,0 +1,11 @@
+---
+- name: Setup monitor program
+  become: yes
+  become_user: root
+  copy:
+    src: files/prom2json
+    dest: /usr/local/bin/prom2json
+    owner: root
+    group: root
+    mode: 0755
+    backup: yes

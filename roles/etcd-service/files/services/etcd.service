@@ -1,0 +1,23 @@
+[Unit]
+Description=Etcd Server
+After=network.target
+After=network-online.target
+Wants=network-online.target
+After=etcd-status-guard.service
+Wants=etcd-status-guard.service
+
+[Service]
+Type=notify
+WorkingDirectory=/data/
+EnvironmentFile=-/etc/etcd/etcd.conf
+EnvironmentFile=-/etc/etcd/runtime_etcd.conf
+User=root
+# set GOMAXPROCS to number of processors
+ExecStart=/bin/bash -c "ETCD_NAME=etcd$UNIQUESID /usr/local/bin/etcd"
+ExecStartPost=/usr/local/bin/post_run.sh
+LimitNOFILE=65536
+NotifyAccess=all
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target

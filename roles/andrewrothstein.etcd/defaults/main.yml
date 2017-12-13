@@ -1,0 +1,10 @@
+---
+etcd_version: v3.2.12
+etcd_platform: linux-amd64
+etcd_mirror: https://github-releases.pek3a.qingstor.com/coreos/etcd
+etcd_install_dir: /usr/local/bin
+
+etcd_checksums:
+  linux-amd64: sha256:824be0cb88c9f1c5c3987624828c33e561bcb5a0fd31624cc9ca4925a1539cac
+
+etcd_download_timeout_seconds: 600

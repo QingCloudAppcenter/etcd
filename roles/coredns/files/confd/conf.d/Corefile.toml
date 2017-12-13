@@ -1,0 +1,6 @@
+[template]
+src = "Corefile.tmpl"
+dest = "/var/lib/etcd/coredns/Corefile"
+  keys = [
+    "/",
+]
