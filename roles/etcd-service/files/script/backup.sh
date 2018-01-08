@@ -9,6 +9,6 @@ index=0
 while [ "$index" -lt $HOST_NUM ]
 do
   hostIpname=HOST_$index
-  rsync $ETCD_BACKUP_DIR/snapshot.db root@${!hostIpname}:/$ETCD_BACKUP_DIR/snapshot.db
+  rsync $ETCD_BACKUP_DIR/snapshot.db root@${!hostIpname}:$ETCD_BACKUP_DIR/snapshot.db
   index=$(($index + 1 ))
 done

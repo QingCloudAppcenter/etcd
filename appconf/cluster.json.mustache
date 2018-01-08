@@ -9,7 +9,7 @@
         "container": {
             "type": "kvm",
             "zone": "pek3a",
-            "image": "img-lg6erfcj"
+            "image": "img-cu9keuw5"
         },
         "count": {{cluster.etcd_node.count}},
         "instance_class": {{cluster.etcd_node.instance_class}},
@@ -22,7 +22,6 @@
             "mount_options": "defaults,noatime"
         },
         "server_id_upper_bound": 255,
-        "vertical_scaling_policy": "parallel",
         "services": {
             "init": {
                 "nodes_to_execute_on": 1,
@@ -61,7 +60,7 @@
               "cmd": "/usr/local/bin/backup.sh"
             },
             "restore": {
-              "cmd": "/usr/local/bin/restore.sh;systemctl start etcd"
+              "cmd": "/usr/local/bin/restore.sh;systemctl start etcd;echo 'finished' "
             },
             "delete_snapshot": {
               "cmd": "/usr/local/bin/delete_backup.sh"
@@ -75,7 +74,7 @@
             "healthy_threshold": 3,
             "unhealthy_threshold": 3,
             "check_cmd": "curl http://127.0.0.1:2379/health",
-            "action_cmd": "systemctl stop etcd;/usr/local/bin/restore.sh;systemctl start etcd"
+            "action_cmd": "systemctl stop etcd;systemctl stop etcd-status-guard;/usr/local/bin/leave.sh;systemctl start etcd"
         },
           "env": {
                 "etcautocompact": {{env.etcd_node.autocompact}}
@@ -230,7 +229,6 @@
         "cpu": {{cluster.etcd_proxy.cpu}},
         "memory": {{cluster.etcd_proxy.memory}},
         "server_id_upper_bound": 255,
-        "vertical_scaling_policy": "parallel",
         "services": {
             "start": {
               "order": 2,

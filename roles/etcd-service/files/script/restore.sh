@@ -3,6 +3,7 @@
 source /etc/etcd/etcd.conf
 
 rm -fr $ETCD_DATA_DIR
+mkdir -p $ETCD_DATA_DIR
 
 ETCDCTL_API=3 etcdctl snapshot restore $ETCD_BACKUP_DIR/snapshot.db \
   --name etcd$UNIQUESID \

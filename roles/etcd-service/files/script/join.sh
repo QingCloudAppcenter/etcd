@@ -1,4 +1,5 @@
 #!/bin/bash
+mkdir -p $ETCD_BACKUP_DIR
 if [ -f $ETCD_DATA_DIR ]
 then
   echo ETCD_INITIAL_CLUSTER_STATE=existing >> /etc/etcd/runtime_etcd.conf
