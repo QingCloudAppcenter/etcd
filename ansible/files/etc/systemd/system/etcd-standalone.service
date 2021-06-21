@@ -1,0 +1,15 @@
+[Unit]
+Description=etcd standalone
+Documentation=https://github.com/etcd-io/etcd
+After=network.target
+Conflicts=etcd.service
+
+[Service]
+Type=notify
+User=etcd
+EnvironmentFile=/opt/app/conf/etcd.env
+ExecStart=/opt/etcd/current/etcd --force-new-cluster
+TimeoutStartSec=20
+
+[Install]
+WantedBy=multi-user.target

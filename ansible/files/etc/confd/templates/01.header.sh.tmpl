@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+set -e
+
+# etcd-node|etcd-proxy
+{{- $myRole := replace (getv "/host/role") "_" "-" -1 }}
+{{- $mySid := getv "/host/sid" }}
+{{- $myIp := getv "/host/ip" }}
+
+{{- $addedInstances := ls "/adding-hosts/etcd_node" }}
+{{- $deletedInstances := ls "/deleting-hosts/etcd_node" }}
+
+{{- $isAdded := eq (len ($addedInstances | filter (getv "/host/instance_id"))) 1 }}
+{{- $isDeleted := eq (len ($deletedInstances | filter (getv "/host/instance_id"))) 1 }}
+
+updateAndCompareFile() {
+  cat > "$1.new" -
+  local changes=$(diff -N --unchanged-line-format= --new-line-format="%L" "$1" "$1.new")
+  mv "$1.new" "$1"
+  echo "$changes"
+}
+
+map() {
+  local func=$1
+  local args="${@:2}"
+  for arg in $args; do
+    echo $($func $arg)
+  done
+}
+
+buildEndpoint() {
+  echo -n http://${1#*=}:2379
+}
+
+allNodes="$(sort -V - << ALL_NODES_EOF
+{{- range ls "/hosts/etcd_node" }}
+{{ getv (printf "/hosts/etcd_node/%s/sid" .) }}={{ getv (printf "/hosts/etcd_node/%s/ip" .) }}
+{{- end }}
+ALL_NODES_EOF
+)"
+
+stableNodes="$(sort -V - << STABLE_NODES_EOF
+{{- range ls "/hosts/etcd_node" }}
+  {{- if not (len ($addedInstances | filter .)) }}
+    {{- if not (len ($deletedInstances | filter .)) }}
+      {{ getv (printf "/hosts/etcd_node/%s/sid" .) }}={{ getv (printf "/hosts/etcd_node/%s/ip" .) }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+STABLE_NODES_EOF
+)"
+stableEndpointLines=$(map buildEndpoint "$stableNodes")
+stableEndpoints=$(echo $stableEndpointLines | tr " " ",")

@@ -1,12 +1,6 @@
-# etcd
+<p align="center">
+  <img src="./logo.png" alt="Logo" />
+</p>
+<h1 align="center">etcd on QingCloud</h1>
 
-1. edit inventory file hosts
-1. run ansible commands
-
-  ``` shell
-  ansible-playbook -i hosts site.yml
-  ```
-
-1. shutdown instance and create image
-1. update imageid in cluster.json.mustache
-1. upload configuration
+- [Product Page](https://appcenter.qingcloud.com/apps/app-fdyvu2wk)

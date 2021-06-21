@@ -1,0 +1,155 @@
+{
+  "name": {{cluster.name}},
+  "description": {{cluster.description}},
+  "vxnet": {{cluster.vxnet}},
+  "incremental_backup_supported": false,
+  "backup_policy": "device",
+  "advanced_actions": [ "scale_horizontal" ],
+  "upgrade_policy": [ "appv-yycc2fun" ],
+  "upgrading_policy": "sequential",
+  "multi_zone_policy": "round_robin",
+  "nodes": [{
+    "role": "etcd_node",
+    "container": {
+      "type": "kvm",
+      "zone": "pek3a",
+      "image": "img-7gi225x6"
+    },
+    "count": {{cluster.etcd_node.count}},
+    "instance_class": {{cluster.etcd_node.instance_class}},
+    "cpu": {{cluster.etcd_node.cpu}},
+    "memory": {{cluster.etcd_node.memory}},
+    "volume": {
+      "size": {{cluster.etcd_node.volume_size}},
+      "mount_point": "/var/lib/etcd/",
+      "filesystem": "ext4",
+      "mount_options": "defaults,noatime"
+    },
+    "server_id_upper_bound": 255,
+    "services": {
+      "init": {
+        "cmd": "/opt/app/bin/ctl.sh init"
+      },
+      "start": {
+        "order": 1,
+        "cmd": "/opt/app/bin/ctl.sh start",
+        "timeout": 86400
+      },
+      "stop": {
+        "order": 2,
+        "cmd": "/opt/app/bin/ctl.sh stop"
+      },
+      "destroy": {
+        "order": 2,
+        "allow_force": false,
+        "post_stop_service": false,
+        "cmd": "/opt/app/bin/ctl.sh destroy",
+        "timeout": 100
+      },
+      "upgrade": {
+        "cmd": "/opt/app/bin/ctl.sh init"
+      },
+      "backup": {
+        "nodes_to_execute_on": 1,
+        "cmd": "/opt/app/bin/ctl.sh backup"
+      },
+      "restore": {
+        "cmd": "/opt/app/bin/ctl.sh restore"
+      },
+      "repair": {
+        "type": "custom",
+        "cmd": "/opt/app/bin/ctl.sh repair",
+        "service_params": {
+          "node.ip": {{service_params.etcd_node.node.ip}}
+        }
+      },
+      "compact": {
+        "nodes_to_execute_on": 1,
+        "type": "custom",
+        "cmd": "/opt/app/bin/ctl.sh compact",
+        "timeout": 86400
+      }
+    },
+    "env": {
+      "etcautocompact": {{env.etcd_node.autocompact}}
+    },
+    "monitor": {
+      "enable": true,
+      "cmd": "/opt/app/bin/ctl.sh measure",
+      "items": {
+        "etcd_server_has_leader": {
+          "statistics_type": "latest"
+        },
+        "etcd_server_is_leader": {
+          "statistics_type": "latest"
+        },
+        "etcd_server_leader_changes_seen_total": {
+          "statistics_type": "latest"
+        },
+        "etcd_network_peer_sent_bytes_total": {
+          "statistics_type": "latest"
+        },
+        "http_requests_total": {
+          "statistics_type": "latest"
+        },
+        "process_resident_memory_bytes": {
+          "statistics_type": "latest"
+        },
+        "process_virtual_memory_bytes": {
+          "statistics_type": "latest"
+        }
+      },
+      "groups": {
+        "state": ["etcd_server_has_leader", "etcd_server_is_leader", "etcd_server_leader_changes_seen_total"],
+        "data": ["etcd_network_peer_sent_bytes_total"],
+        "memory": ["process_resident_memory_bytes", "process_virtual_memory_bytes"]
+      },
+      "display": ["state", "data", "memory", "http_requests_total"],
+      "alarm": ["etcd_server_has_leader"]
+    }
+  }, {
+    "role": "etcd_proxy",
+    "container": {
+      "type": "kvm",
+      "zone": "pek3a",
+      "image": "img-7gi225x6"
+    },
+    "count": {{cluster.etcd_proxy.count}},
+    "instance_class": {{cluster.etcd_proxy.instance_class}},
+    "cpu": {{cluster.etcd_proxy.cpu}},
+    "memory": {{cluster.etcd_proxy.memory}},
+    "server_id_upper_bound": 255,
+    "services": {
+      "init": {
+        "cmd": "/opt/app/bin/ctl.sh init"
+      },
+      "start": {
+        "order": 2,
+        "cmd": "/opt/app/bin/ctl.sh start"
+      },
+      "stop": {
+        "order": 1,
+        "cmd": "/opt/app/bin/ctl.sh stop"
+      },
+      "upgrade": {
+        "cmd": "/opt/app/bin/ctl.sh init"
+      }
+    }
+  }],
+  "health_check": {
+    "enable": true,
+    "interval_sec": 60,
+    "timeout_sec": 10,
+    "action_timeout_sec": 60,
+    "healthy_threshold": 2,
+    "unhealthy_threshold": 2,
+    "check_cmd": "/opt/app/bin/ctl.sh check",
+    "action_cmd": "/opt/app/bin/ctl.sh restart"
+  },
+  "endpoints": {
+    "client": {
+      "port": 2379,
+      "protocol": "http"
+    }
+  }
+}

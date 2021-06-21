@@ -1,6 +1,0 @@
-[template]
-src = "etcd.conf.tmpl"
-dest = "/etc/etcd/etcd.conf"
-  keys = [
-    "/",
-]

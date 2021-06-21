@@ -1,0 +1,157 @@
+---
+- hosts: appcenter
+  gather_facts: no
+  no_log: False
+  remote_user: root
+  vars:
+    etcdVersion: v3.2.24
+    etcdVersion2: v3.3.11
+    # ansible_ssh_pass: Zhu1241jie
+    # ansible_python_interpreter: /usr/bin/python3
+    user: etcd
+
+  tasks:
+    - name: Add the Service Group
+      group:
+        name: "{{ user }}"
+        state: present
+
+    - name: Add the Service User
+      user:
+        name: "{{ user }}"
+        groups: "{{ user }}"
+        shell: /sbin/nologin
+        create_home: no
+        append: yes
+        comment: "etcd Service User"
+        state: present
+
+    - name: Copy confd toml files
+      copy:
+        src: files/etc/confd/conf.d/make.sh.toml
+        dest: /etc/confd/conf.d/make.sh.toml
+
+    - name: Compile tmpl files
+      raw: |
+        srcDir=files/etc/confd
+        destDir=files/tmp/confd
+        rm -rf $destDir
+        mkdir -p $destDir/conf.d $destDir/templates
+        tmplFile=$destDir/templates/make.sh.tmpl
+        for tmpl in $(ls $srcDir/templates/*); do
+          cat $tmpl >> $tmplFile
+          echo >> $tmplFile
+        done
+      delegate_to: localhost
+      run_once: true
+
+    - name: Copy confd tmpl files
+      copy:
+        src: files/tmp/confd/templates/make.sh.tmpl
+        dest: /etc/confd/templates/make.sh.tmpl
+
+    - name: Prepare directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - /opt/app/conf
+        - "/opt/etcd/{{ etcdVersion }}"
+        - "/opt/etcd/{{ etcdVersion2 }}"
+
+    - name: Download reusable binaries locally
+      get_url:
+        url: "https://github.com/etcd-io/etcd/releases/download/{{ item }}/etcd-{{ item }}-linux-amd64.tar.gz"
+        dest: "files/tmp/{{ item }}.tgz"
+      delegate_to: localhost
+      with_items:
+        - "{{ etcdVersion }}"
+        - "{{ etcdVersion2 }}"
+
+    - name: Extract etcd binary
+      unarchive:
+        src: "files/tmp/{{ item }}.tgz"
+        dest: "/opt/etcd/{{ item }}"
+        extra_opts: [ --strip-components=1 ]
+        owner: root
+        group: "{{ user }}"
+      with_items:
+        - "{{ etcdVersion }}"
+        - "{{ etcdVersion2 }}"
+
+    - name: Create symbolic Link
+      file:
+        src: "/opt/etcd/{{ etcdVersion }}"
+        dest: "/opt/etcd/current"
+        state: link
+
+    - name: Copy systemd files
+      copy:
+        src: files/etc/systemd/
+        dest: /etc/systemd/
+        directory_mode: yes
+
+    - name: Copy app files
+      copy:
+        src: files/opt/
+        dest: /opt/
+        directory_mode: yes
+
+    - name: Create placeholder
+      copy:
+        content: ""
+        dest: "{{ item }}"
+        force: no
+      with_items:
+        - /opt/app/bin/.env
+        - /opt/app/bin/changes.env
+        - /opt/app/conf/etcd.env
+
+    - name: Protect binaries and configurations
+      file:
+        path: "{{ item }}"
+        owner: root
+        group: "{{ user }}"
+        mode: u=rwx,g=rx,o=
+        recurse: yes
+      with_items:
+        - /etc/confd
+        - /opt
+
+    - name: Prepare local SSH directory
+      file:
+        path: files/tmp/ssh
+        state: directory
+      delegate_to: localhost
+      run_once: true
+
+    - name: Generate RSA host key
+      shell: ssh-keygen -q -t rsa -f files/tmp/ssh/id_rsa -C '' -N ''
+      args:
+        creates: files/tmp/ssh/id_rsa
+      delegate_to: localhost
+      run_once: true
+
+    - name: Copy SSH keys
+      copy:
+        src: files/tmp/ssh/
+        dest: /root/.ssh/
+        mode: u=rw,go=
+
+    - name: Set authorized key taken from file
+      authorized_key:
+        user: root
+        state: present
+        key: "{{ lookup('file', 'files/tmp/ssh/id_rsa.pub') }}"
+        path: /root/.ssh/authorized_keys
+
+    - name: Install Tools
+      apt:
+        update_cache: yes
+        name: ['jq']
+        state: present
+
+    - name: Clean up
+      raw: |
+        >/var/log/syslog
+        >~/.bash_history && history -c

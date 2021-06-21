@@ -1,0 +1,17 @@
+[Unit]
+Description=etcd
+Documentation=https://github.com/etcd-io/etcd
+After=network.target
+Conflicts=etcd-restore.service
+
+[Service]
+Type=notify
+Restart=always
+User=etcd
+EnvironmentFile=/opt/app/conf/etcd.env
+ExecStart=/opt/etcd/current/etcd $etcdOpts
+LimitNOFILE=65536
+TimeoutStartSec=100
+
+[Install]
+WantedBy=multi-user.target
