@@ -167,9 +167,19 @@
         "default": 0,
         "min": 0,
         "required": "yes"
+      },{
+        "key": "quotabytes",
+        "label": "etcd.quota.backend.bytes",
+        "description": "etcdquotabytesdescrip",
+        "type": "integer",
+        "changeable": true,
+        "default": 2147483648,
+        "min": 2147483648,
+        "max": 8589934592,
+        "required": "yes"
       }]
     }]
-  }, {
+  },{
     "key": "service_params",
     "description": "custom services parameters",
     "type": "array",

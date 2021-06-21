@@ -29,6 +29,8 @@
   "compact": "清理历史数据",
   "etcautocompact": "etcd autocompact",
   "etcdautocompactdescrip": "自动清理历史数据的时间间隔，单位是小时，比如 1 表示每隔一小时清理一次数据；默认为 0 表示不自动清除",
+  "etcd.quota.backend.bytes": "etcd quota-backend-bytes",
+  "etcdquotabytesdescrip": "存储大小限制，单位是字节，默认大小为2GB，建议最大值为8GB",
   "repair": "修复",
   "Source Node IP": "源节点 IP 地址",
   "The node IP of etcd from which to take data": "使用源节点上的数据对集群做修复；注意：其他节点原有的数据将被抹除，修复完成后所有节点拥有与此节点相同的数据，如有疑惑请先提交工单获取协助",

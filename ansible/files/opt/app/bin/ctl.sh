@@ -129,7 +129,7 @@ restart() {
 
 update() {
   svc is-enabled -q || return 0
-  [ "$MY_ROLE" = "etcd-proxy" ] || [[ ,${CHANGED_VARS// /,} =~ ,ETCD_COMPACT_INTERVAL= ]] || return 0
+  [ "$MY_ROLE" = "etcd-proxy" ] || [[ ,${CHANGED_VARS// /,} =~ ,ETCD_COMPACT_INTERVAL= ]] || [[ ,${CHANGED_VARS// /,} =~ ,ETCD_QUOTA_BYTES= ]] || return 0
   restart
 }
 

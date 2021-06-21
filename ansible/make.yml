@@ -6,11 +6,24 @@
   vars:
     etcdVersion: v3.2.24
     etcdVersion2: v3.3.11
+    target_env: "{{ lookup('env', 'target') }}"
+    local_cache_path: "~/.ansible/cache"
     # ansible_ssh_pass: Zhu1241jie
     # ansible_python_interpreter: /usr/bin/python3
     user: etcd
 
   tasks:
+    - name: common setup
+      include_role: 
+        name: "{{ service_name }}"
+      loop:
+      - disable-apt-jobs-1.0.0
+      - disable-motd-1.0.0
+      - app-agent-1.0.6
+      - arping-1.0.0
+      loop_control:
+        loop_var: service_name
+
     - name: Add the Service Group
       group:
         name: "{{ user }}"
