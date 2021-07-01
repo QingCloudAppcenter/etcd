@@ -4,8 +4,8 @@
   no_log: False
   remote_user: root
   vars:
-    etcdVersion: v3.2.24
-    etcdVersion2: v3.3.11
+    etcdVersion: v3.2.32
+    etcdVersion2: v3.3.25
     target_env: "{{ lookup('env', 'target') }}"
     local_cache_path: "~/.ansible/cache"
     # ansible_ssh_pass: Zhu1241jie
@@ -20,7 +20,7 @@
       - disable-apt-jobs-1.0.0
       - disable-motd-1.0.0
       - app-agent-1.0.6
-      - arping-1.0.0
+      - arping-1.0.5
       loop_control:
         loop_var: service_name
 

@@ -9,7 +9,7 @@ set -e
 
 command=$1
 args="${@:2}"
-
+etcdVersion=v3.3.25
 check() {
   if [ "$MY_ROLE" = "etcd-node" ]; then
     [ "$(curl -s $(buildClientUrls)/health | jq -r '.health')" = "true" ]
@@ -45,6 +45,7 @@ METRICS_EOF
 }
 
 start() {
+  log "Etcd service is preparing to start"
   if [ "$MY_ROLE" = "etcd-node" ] && [ "$IS_ADDED" = "true" ]; then
     buildCluster "$ADDED_NODES"
   else
@@ -54,6 +55,7 @@ start() {
 }
 
 stop() {
+  log "Etcd service is asked to stop ."
   svc stop
 }
 
@@ -124,12 +126,34 @@ restore() {
 }
 
 restart() {
+  log "Etcd service is asked to restart ."
   stop && start
+}
+
+upgrade() {
+  # 先升级至当前次版本号对应的最新修订版本号以规避升级bug，后升级至目标版本
+  init
+  log "Etcd service is prepared to upgrade to $etcdVersion"
+  local sleepMaxTime=0
+  while :
+  do
+     check && break || echo -n
+     sleepMaxTime=`expr ${sleepMaxTime} + 1`
+     if [ ${sleepMaxTime} -ge 60 ]; then
+        return -1
+     fi
+     sleep 1s
+  done 
+  stop
+  rm -rf /opt/etcd/current
+  ln -s /opt/etcd/$etcdVersion /opt/etcd/current
+  init
+  start
 }
 
 update() {
   svc is-enabled -q || return 0
-  [ "$MY_ROLE" = "etcd-proxy" ] || [[ ,${CHANGED_VARS// /,} =~ ,ETCD_COMPACT_INTERVAL= ]] || [[ ,${CHANGED_VARS// /,} =~ ,ETCD_QUOTA_BYTES= ]] || return 0
+  [ "$MY_ROLE" = "etcd-proxy" ] || [[ ,${CHANGED_VARS// /,} =~ ,ETCD_ ]] || return 0
   restart
 }
 
