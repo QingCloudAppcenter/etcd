@@ -133,10 +133,12 @@ restart() {
 upgrade() {
   # 先升级至当前次版本号对应的最新修订版本号以规避升级bug，后升级至目标版本
   init
+   
   log "Etcd service is prepared to upgrade to $etcdVersion"
   local sleepMaxTime=0
   while :
   do
+     curl -L $(buildClientUrls)/version >>/root/a.txt || echo
      check && break || echo -n
      sleepMaxTime=`expr ${sleepMaxTime} + 1`
      if [ ${sleepMaxTime} -ge 60 ]; then
@@ -147,7 +149,9 @@ upgrade() {
   stop
   rm -rf /opt/etcd/current
   ln -s /opt/etcd/$etcdVersion /opt/etcd/current
+  
   init
+  curl -L $(buildClientUrls)/version >>/root/a.txt || echo
   start
 }
 

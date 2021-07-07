@@ -18,7 +18,7 @@ EC_UNHEALTHY=17            # check: cluster is unhealthy
 EC_NO_MEMBER_ID=18         # member: failed to find ID
 
 workingDir=/var/lib/etcd
-appctlDir=$workingDir/appctl
+appctlDir=$workingDir/appctl  # Log Dir
 
 log() {
   logger -t $MY_ROLE.appctl --id=$$ [cmd=$command role=$MY_ROLE] "$@" || return $EC_LOGGING
