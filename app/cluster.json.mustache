@@ -47,6 +47,7 @@
         "timeout": 100
       },
       "upgrade": {
+        "post_start_service": true,
         "cmd": "/opt/app/bin/ctl.sh upgrade"
       },
       "backup": {
@@ -133,6 +134,7 @@
         "cmd": "/opt/app/bin/ctl.sh stop"
       },
       "upgrade": {
+        "post_start_service": true,
         "cmd": "/opt/app/bin/ctl.sh upgrade"
       }
     }
