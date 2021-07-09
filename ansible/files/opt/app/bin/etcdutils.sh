@@ -45,7 +45,7 @@ etcdctl() {
 }
 
 takeBackup() {
-  ETCDCTL_API=2 runCmd /opt/etcd/v3.3.11/etcdctl backup --data-dir=$etcdDataDir --backup-dir=$1 --with-v3
+  ETCDCTL_API=2 runCmd /opt/etcd/v3.3.25/etcdctl backup --data-dir=$etcdDataDir --backup-dir=$1 --with-v3
 }
 
 takeSnap() {
