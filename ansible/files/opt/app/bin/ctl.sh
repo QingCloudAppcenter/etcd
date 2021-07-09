@@ -9,7 +9,8 @@ set -e
 
 command=$1
 args="${@:2}"
-etcdVersion=v3.3.25
+etcdTempVersion=v3.2.32
+etcdTargetVersion=v3.3.25
 check() {
   if [ "$MY_ROLE" = "etcd-node" ]; then
     [ "$(curl -s $(buildClientUrls)/health | jq -r '.health')" = "true" ]
@@ -132,9 +133,10 @@ restart() {
 
 upgrade() {
   # 先升级至当前次版本号对应的最新修订版本号以规避升级bug，后升级至目标版本
+  rm -rf /opt/etcd/current
+  ln -s /opt/etcd/$etcdTempVersion /opt/etcd/current
   init
-   
-  log "Etcd service is prepared to upgrade to $etcdVersion"
+  log "Etcd service is prepared to upgrade to $etcdTargetVersion"
   local sleepMaxTime=0
   while :
   do
@@ -148,9 +150,7 @@ upgrade() {
   done 
   stop
   rm -rf /opt/etcd/current
-  ln -s /opt/etcd/$etcdVersion /opt/etcd/current
-  
-  init
+  ln -s /opt/etcd/$etcdTargetVersion /opt/etcd/current
   curl -L $(buildClientUrls)/version >>/root/a.txt || echo
   start
 }
