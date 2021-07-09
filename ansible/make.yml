@@ -4,8 +4,8 @@
   no_log: False
   remote_user: root
   vars:
-    etcdVersion: v3.2.32
-    etcdVersion2: v3.3.25
+    etcdVersion: v3.3.25
+    etcdVersion2: v3.4.0
     target_env: "{{ lookup('env', 'target') }}"
     local_cache_path: "~/.ansible/cache"
     # ansible_ssh_pass: Zhu1241jie
@@ -94,7 +94,7 @@
 
     - name: Create symbolic Link
       file:
-        src: "/opt/etcd/{{ etcdVersion }}"
+        src: "/opt/etcd/{{ etcdVersion2 }}"
         dest: "/opt/etcd/current"
         state: link
 

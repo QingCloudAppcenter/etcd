@@ -45,7 +45,7 @@ etcdctl() {
 }
 
 takeBackup() {
-  ETCDCTL_API=2 runCmd /opt/etcd/v3.3.25/etcdctl backup --data-dir=$etcdDataDir --backup-dir=$1 --with-v3
+  ETCDCTL_API=2 runCmd /opt/etcd/v3.4.0/etcdctl backup --data-dir=$etcdDataDir --backup-dir=$1 --with-v3
 }
 
 takeSnap() {
@@ -90,8 +90,11 @@ ETCD_ADVERTISE_CLIENT_URLS=$(buildClientUrls)
 ETCD_INITIAL_CLUSTER=${members// /,}
 ETCD_INITIAL_CLUSTER_TOKEN=$etcdClusterToken
 ETCD_AUTO_COMPACTION_RETENTION=$ETCD_COMPACT_INTERVAL
+ETCD_AUTO_COMPACTION_MODE=periodic
 ETCD_QUOTA_BACKEND_BYTES=$ETCD_QUOTA_BYTES
 ETCD_INITIAL_CLUSTER_STATE=$state
+ETCD_ENABLE_V2=true
+
 ETCD_ENV_FILE_EOF
 }
 

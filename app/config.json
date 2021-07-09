@@ -9,7 +9,7 @@
       "label": "name",
       "description": "etcdAppName",
       "type": "string",
-      "default": "etcd 3.3.25",
+      "default": "etcd 3.4.0",
       "required": "no"
     }, {
       "key": "description",

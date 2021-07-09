@@ -9,7 +9,7 @@ set -e
 
 command=$1
 args="${@:2}"
-etcdVersion=v3.3.25
+etcdVersion=v3.4.0
 check() {
   if [ "$MY_ROLE" = "etcd-node" ]; then
     [ "$(curl -s $(buildClientUrls)/health | jq -r '.health')" = "true" ]
@@ -146,13 +146,13 @@ upgrade() {
      fi
      sleep 1s
   done 
-  stop
-  rm -rf /opt/etcd/current
-  ln -s /opt/etcd/$etcdVersion /opt/etcd/current
+  #stop
+  #rm -rf /opt/etcd/current
+  #ln -s /opt/etcd/$etcdVersion /opt/etcd/current
   
-  init
-  curl -L $(buildClientUrls)/version >>/root/a.txt || echo
-  start
+  #init
+  #curl -L $(buildClientUrls)/version >>/root/a.txt || echo
+  #start
 }
 
 update() {
