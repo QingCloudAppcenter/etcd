@@ -94,7 +94,7 @@
 
     - name: Create symbolic Link
       file:
-        src: "/opt/etcd/{{ etcdVersion }}"
+        src: "/opt/etcd/{{ etcdVersion2 }}"
         dest: "/opt/etcd/current"
         state: link
 
