@@ -66,11 +66,13 @@ restoreSnap() {
 
 svc() {
   systemctl $@ etcd
+
+  nodeexporter=`curl -s  metadata/self/env/nodeexporter/nodeexporter`
+  if [ $nodeexporter = "true" ] ;then
+  systemctl $@ node_exporter
+  fi
 }
 
-svc_node_exporter() {
-  systemctl $@ node_exporter
-}
 
 
 prepareEtcdConfig() {

@@ -26,11 +26,6 @@ init() {
     chown -R etcd.etcd $workingDir
   }
   svc enable
-
-  nodeexporter=`curl -s  metadata/self/env/nodeexporter/nodeexporter`
-  if [ $nodeexporter = "true" ] ;then
-  svc_node_exporter enable
-  fi
 }
 
 metricsKeys="
