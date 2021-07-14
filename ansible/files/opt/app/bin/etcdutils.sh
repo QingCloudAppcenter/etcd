@@ -68,6 +68,11 @@ svc() {
   systemctl $@ etcd
 }
 
+svc_node_exporter() {
+  systemctl $@ node_exporter
+}
+
+
 prepareEtcdConfig() {
   if [ "$MY_ROLE" = "etcd-proxy" ]; then
     cat > $etcdEnvFile << PROXY_ENV_FILE_EOF

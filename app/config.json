@@ -177,6 +177,14 @@
         "min": 2147483648,
         "max": 8589934592,
         "required": "yes"
+      },{
+        "key": "nodeexporter",
+        "label": "node.exporter",
+        "description": "nodeexporterdescrip",
+        "type": "string",
+        "default": "false",
+        "range": ["true", "false"],
+        "required": "no"
       }]
     }]
   },{

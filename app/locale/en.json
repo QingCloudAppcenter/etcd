@@ -33,5 +33,8 @@
   "etcdnodelb":"LB for etcd",
   "etcdnodelbdescript":"load balancer for etcd service",
   "corednslb":"LB for coredns",
-  "corednslbdescript":"Load balancer for coredns service"
+  "corednslbdescript":"Load balancer for coredns service",
+  "nodeexporterdescrip": "Enable node_exporter,Monitor server CPU, memory, disk, I / O and other information",
+  "node.exporter": "node_exporter"
+
 }
