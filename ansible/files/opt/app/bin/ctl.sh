@@ -6,6 +6,7 @@ set -e
 . /opt/app/bin/changes.env
 . /opt/app/bin/common.sh
 . /opt/app/bin/etcdutils.sh
+. /opt/app/bin/nodeexporter.sh
 
 command=$1
 args="${@:2}"
@@ -19,6 +20,17 @@ check() {
   fi
 }
 
+
+updateNodeexporterServer(){
+
+  if [ $NODE_EXPORTER = "true" ] ;then
+  systemctl start node_exporter
+  else
+  systemctl stop node_exporter
+  fi
+}
+
+
 init() {
   [ "$MY_ROLE" = "etcd-proxy" ] || {
     rm -rf $workingDir/lost+found
@@ -26,6 +38,7 @@ init() {
     chown -R etcd.etcd $workingDir
   }
   svc enable
+  updateNodeexporterServer
 }
 
 metricsKeys="
@@ -223,4 +236,10 @@ repair() {
   restore
 }
 
+
+
+
+
 $command $args
+
+

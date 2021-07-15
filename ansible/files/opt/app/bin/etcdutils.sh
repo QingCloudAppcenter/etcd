@@ -7,6 +7,9 @@ etcdEnvFile=/opt/app/conf/etcd.env
 etcdName=etcd$MY_SID
 etcdClusterToken=etcd-$CLUSTER_ID
 
+
+
+
 buildMemberName() {
   echo etcd${1:-$MY_SID}
 }
@@ -66,11 +69,6 @@ restoreSnap() {
 
 svc() {
   systemctl $@ etcd
-
-  nodeexporter=`curl -s  metadata/self/env/nodeexporter/nodeexporter`
-  if [ $nodeexporter = "true" ] ;then
-  systemctl $@ node_exporter
-  fi
 }
 
 

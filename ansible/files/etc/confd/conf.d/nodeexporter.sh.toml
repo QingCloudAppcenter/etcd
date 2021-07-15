@@ -1,0 +1,8 @@
+[template]
+src = "nodeexporter.sh.tmpl"
+dest = "/opt/app/bin/nodeexporter.sh"
+mode = "0700"
+keys = [
+  "/",
+]
+reload_cmd = "/opt/app/bin/ctl.sh updateNodeexporterServer"
