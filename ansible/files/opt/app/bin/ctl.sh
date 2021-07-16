@@ -24,9 +24,17 @@ check() {
 updateNodeexporterServer(){
 
   if [ $NODE_EXPORTER = "true" ] ;then
-  systemctl start node_exporter
+    log "NODE_EXPORTER service is preparing to start"
+    systemctl start node_exporter
+    if [ $? -eq 0 ] ;then
+        log "NODE_EXPORTER service  start success"
+    fi
   else
-  systemctl stop node_exporter
+    log "NODE_EXPORTER service is preparing to stop"
+    systemctl stop node_exporter
+    if [ $? -eq 0 ] ;then
+        log "NODE_EXPORTER service  stop success"
+    fi
   fi
 }
 
