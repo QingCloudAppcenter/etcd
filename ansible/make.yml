@@ -39,22 +39,27 @@
         comment: "etcd Service User"
         state: present
 
-    - name: Copy confd toml files
+    - name: Copy confd make.toml files
       copy:
         src: files/etc/confd/conf.d/make.sh.toml
         dest: /etc/confd/conf.d/make.sh.toml
 
+    - name: Copy confd nodeexporter.toml files
+      copy:
+          src: files/etc/confd/conf.d/nodeexporter.sh.toml
+          dest: /etc/confd/conf.d/nodeexporter.sh.toml
+
     - name: Compile tmpl files
       raw: |
-        srcDir=files/etc/confd
-        destDir=files/tmp/confd
-        rm -rf $destDir
-        mkdir -p $destDir/conf.d $destDir/templates
-        tmplFile=$destDir/templates/make.sh.tmpl
-        for tmpl in $(ls $srcDir/templates/*); do
-          cat $tmpl >> $tmplFile
-          echo >> $tmplFile
-        done
+          srcDir=files/etc/confd
+          destDir=files/tmp/confd
+          rm -rf $destDir
+          mkdir -p $destDir/conf.d $destDir/templates
+          tmplFile=$destDir/templates/make.sh.tmpl
+          for tmpl in $(ls $srcDir/templates/01.header.sh.tmpl $srcDir/templates/02.app.env.tmpl); do
+            cat $tmpl >> $tmplFile
+            echo >> $tmplFile
+          done
       delegate_to: localhost
       run_once: true
 
@@ -62,6 +67,11 @@
       copy:
         src: files/tmp/confd/templates/make.sh.tmpl
         dest: /etc/confd/templates/make.sh.tmpl
+
+    - name: Copy confd nodeexporter.tmpl files
+      copy:
+        src: files/etc/confd/templates/nodeexporter.sh.tmpl
+        dest: /etc/confd/templates/nodeexporter.sh.tmpl
 
     - name: Prepare directories
       file:
@@ -163,6 +173,59 @@
         update_cache: yes
         name: ['jq']
         state: present
+
+
+    - name: Add the prometheus Service Group
+      group:
+       name: "prometheus"
+       state: present
+
+    - name: Add the prometheus Service User
+      user:
+        name: "prometheus"
+        groups: "prometheus"
+        shell: /sbin/nologin
+        create_home: no
+        home: /var/lib/prometheus
+        append: yes
+        comment: "prometheus Service User"
+        state: present
+
+    - name: mkdir  /usr/local/prometheus
+      file:
+        path:  /usr/local/prometheus
+        state: directory
+        owner: prometheus
+        group: prometheus
+        mode: 0755
+
+
+    - name: mkdir /usr/local/bin/node_exporter
+      file:
+        path:  /usr/local/bin/node_exporter
+        state: directory
+        mode: 0755
+
+
+    - name: Download node_exporter-0.18.1 reusable binaries locally
+      get_url:
+        url: "https://github.com/prometheus/node_exporter/releases/download/v0.18.1/{{ item }}.linux-amd64.tar.gz"
+        dest: "files/tmp/{{ item }}.tgz"
+      delegate_to: localhost
+      with_items:
+        - "node_exporter-0.18.1"
+
+    - name: Extract node_exporter-0.18.1 binary
+      unarchive:
+        src: "files/tmp/{{ item }}.tgz"
+        #          dest: "/usr/local/bin/node_exporter/{{ item }}.linux-amd64"
+        dest: "/usr/local/bin/node_exporter/"
+        extra_opts: [ --strip-components=1 ]
+        owner: root
+        group: root
+      with_items:
+        - "node_exporter-0.18.1"
+
 
     - name: Clean up
       raw: |
