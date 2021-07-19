@@ -34,7 +34,7 @@
   "etcdnodelbdescript":"load balancer for etcd service",
   "corednslb":"LB for coredns",
   "corednslbdescript":"Load balancer for coredns service",
-  "nodeexporterdescrip": "Enable node_exporter,Monitor server CPU, memory, disk, I / O and other information",
+  "nodeexporterdescrip": "Enable node_exporter,Monitor server CPU, memory, disk, I / O and other information,The default crawl address is http://IP:9100/metrics",
   "node.exporter": "node_exporter"
 
 }

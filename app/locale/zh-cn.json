@@ -51,6 +51,6 @@
   "process_virtual_memory_bytes": "虚拟内存字节数",
   "corednslb": "coredns负载均衡器",
   "corednslbdescript": "给coredns服务的负载均衡器，端口为53",
-  "nodeexporterdescrip": "开启nodeexporter， 可以监控服务器CPU、内存、磁盘、I/O等信息",
+  "nodeexporterdescrip": "开启nodeexporter,可以监控服务器CPU、内存、磁盘、I/O等信息,Node Exporter默认的抓取地址为：http://IP:9100/metrics,每个节点有自己的单独的Node Exporter",
   "node.exporter": "node_exporter"
 }
