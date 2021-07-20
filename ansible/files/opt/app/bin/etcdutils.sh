@@ -131,7 +131,7 @@ checkMemberRemoved() {
 findMemberId() {
   local eps="$(joinArgs $(buildEndpoints))" member
   [ -z "$2" ] || eps=$(buildClientUrls $2)
-  member=$(etcdctl --endpoints=$eps member list | grep "http://$1:")
+  member=$(etcdctl   member list | grep "http://$1:")
   log "Found member '$member' of '$1' with endpoint $eps ..."
   echo -n ${member%%, *}
 }

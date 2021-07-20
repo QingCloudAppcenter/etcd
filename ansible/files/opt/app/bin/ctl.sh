@@ -158,7 +158,7 @@ upgrade() {
   local sleepMaxTime=0
   while :
   do
-     curl -L $(buildClientUrls)/version >>/root/a.txt || echo
+#     curl -L $(buildClientUrls)/version >>/root/a.txt || echo
      check && break || echo -n
      sleepMaxTime=`expr ${sleepMaxTime} + 1`
      if [ ${sleepMaxTime} -ge 60 ]; then
