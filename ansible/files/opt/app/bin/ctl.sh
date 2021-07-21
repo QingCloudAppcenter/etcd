@@ -134,7 +134,7 @@ restore() {
       log "Updating my peer url ..."
       local myMemberId
       myMemberId=$(findMemberId localhost $MY_IP)
-      retry 10 1 etcdctl --endpoints=$(buildClientUrls) member update $myMemberId --peer-urls=$(buildMemberUrls) || {
+      retry 10 1 etcdctl  member update $myMemberId --peer-urls=$(buildMemberUrls) || {
         systemctl stop etcd-standalone
         return $EC_RESTORE_ERROR
       }
