@@ -4,8 +4,8 @@
   no_log: False
   remote_user: root
   vars:
-    etcdVersion: v3.3.25
-    etcdVersion2: v3.4.0
+    etcdVersion: v3.4.0
+    etcdVersion2: v3.4.16
     target_env: "{{ lookup('env', 'target') }}"
     local_cache_path: "~/.ansible/cache"
     # ansible_ssh_pass: Zhu1241jie
@@ -21,6 +21,7 @@
       - disable-motd-1.0.0
       - app-agent-1.0.6
       - arping-1.0.5
+      - node-exporter-1.0.0
       loop_control:
         loop_var: service_name
 
@@ -173,59 +174,6 @@
         update_cache: yes
         name: ['jq']
         state: present
-
-
-    - name: Add the prometheus Service Group
-      group:
-       name: "prometheus"
-       state: present
-
-    - name: Add the prometheus Service User
-      user:
-        name: "prometheus"
-        groups: "prometheus"
-        shell: /sbin/nologin
-        create_home: no
-        home: /var/lib/prometheus
-        append: yes
-        comment: "prometheus Service User"
-        state: present
-
-    - name: mkdir  /usr/local/prometheus
-      file:
-        path:  /usr/local/prometheus
-        state: directory
-        owner: prometheus
-        group: prometheus
-        mode: 0755
-
-
-    - name: mkdir /usr/local/bin/node_exporter
-      file:
-        path:  /usr/local/bin/node_exporter
-        state: directory
-        mode: 0755
-
-
-    - name: Download node_exporter-0.18.1 reusable binaries locally
-      get_url:
-        url: "https://github.com/prometheus/node_exporter/releases/download/v0.18.1/{{ item }}.linux-amd64.tar.gz"
-        dest: "files/tmp/{{ item }}.tgz"
-      delegate_to: localhost
-      with_items:
-        - "node_exporter-0.18.1"
-
-    - name: Extract node_exporter-0.18.1 binary
-      unarchive:
-        src: "files/tmp/{{ item }}.tgz"
-        #          dest: "/usr/local/bin/node_exporter/{{ item }}.linux-amd64"
-        dest: "/usr/local/bin/node_exporter/"
-        extra_opts: [ --strip-components=1 ]
-        owner: root
-        group: root
-      with_items:
-        - "node_exporter-0.18.1"
-
 
     - name: Clean up
       raw: |

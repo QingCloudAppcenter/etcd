@@ -10,7 +10,7 @@ set -e
 
 command=$1
 args="${@:2}"
-etcdVersion=v3.4.0
+etcdVersion=v3.4.16
 check() {
   if [ "$MY_ROLE" = "etcd-node" ]; then
     [ "$(curl -s $(buildClientUrls)/health | jq -r '.health')" = "true" ]

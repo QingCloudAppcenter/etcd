@@ -5,7 +5,7 @@
   "incremental_backup_supported": false,
   "backup_policy": "device",
   "advanced_actions": [ "scale_horizontal" ],
-  "upgrade_policy": ["appv-u2me89o5"],
+  "upgrade_policy": ["appv-u2me89o5","appv-fpqnuucx"],
   "upgrading_policy": "sequential",
   "multi_zone_policy": "round_robin",
   "nodes": [{
@@ -13,7 +13,7 @@
     "container": {
       "type": "kvm",
       "zone": "pek3",
-      "image": "img-1ytwogxo"
+      "image": "img-9lwc20uk"
     },
     "count": {{cluster.etcd_node.count}},
     "instance_class": {{cluster.etcd_node.instance_class}},
@@ -115,7 +115,7 @@
     "container": {
       "type": "kvm",
       "zone": "pek3",
-      "image": "img-1ytwogxo"
+      "image": "img-9lwc20uk"
     },
     "count": {{cluster.etcd_proxy.count}},
     "instance_class": {{cluster.etcd_proxy.instance_class}},
