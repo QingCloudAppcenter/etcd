@@ -136,11 +136,11 @@
         path: "{{ item }}"
         owner: root
         group: "{{ user }}"
-        mode: u=rwx,g=rx,o=
+        mode: u=rwx,g=rx,o=rx
         recurse: yes
       with_items:
         - /etc/confd
-        - /opt
+        - /opt/
 
     - name: Prepare local SSH directory
       file:
