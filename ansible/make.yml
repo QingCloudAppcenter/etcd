@@ -21,7 +21,7 @@
       - disable-motd-1.0.0
       - app-agent-1.0.6
       - arping-1.0.5
-      - node-exporter-1.2.0
+      - node-exporter-0.18.1
       loop_control:
         loop_var: service_name
 
