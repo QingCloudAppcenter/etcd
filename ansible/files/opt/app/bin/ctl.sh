@@ -70,6 +70,7 @@ start() {
     buildCluster "$ADDED_NODES"
   else
     prepareEtcdConfig
+    chown -R etcd.etcd $workingDir #升级时不会调用init所以在这里重新执行
     svc start
   fi
 }
