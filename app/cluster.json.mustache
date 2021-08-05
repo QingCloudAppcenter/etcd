@@ -12,8 +12,8 @@
     "role": "etcd_node",
     "container": {
       "type": "kvm",
-      "zone": "sh1",
-      "image": "img-68uboyts"
+      "zone": "pek3",
+      "image": "img-j3p6tg85"
     },
     "count": {{cluster.etcd_node.count}},
     "instance_class": {{cluster.etcd_node.instance_class}},
@@ -114,8 +114,8 @@
     "role": "etcd_proxy",
     "container": {
       "type": "kvm",
-      "zone": "sh1",
-      "image": "img-68uboyts"
+      "zone": "pek3",
+      "image": "img-j3p6tg85"
     },
     "count": {{cluster.etcd_proxy.count}},
     "instance_class": {{cluster.etcd_proxy.instance_class}},
@@ -138,6 +138,9 @@
         "post_start_service": true,
         "cmd": "/opt/app/bin/ctl.sh upgrade"
       }
+    },
+    "env": {
+          "nodeexporter": {{env.etcd_node.nodeexporter}}
     }
   }],
   "health_check": {
