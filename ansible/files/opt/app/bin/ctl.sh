@@ -209,7 +209,7 @@ repair() {
     for node in $ALL_NODES; do
       local ip=${node#*=}
       log "Notifying node on $ip ..."
-      [ "$ip" = "$MY_IP" ] || ssh $ip "touch $ready2Copy"
+      [ "$ip" = "$MY_IP" ] || ssh -p 16022 $ip "touch $ready2Copy"
     done
     stop
 
@@ -232,13 +232,13 @@ repair() {
 
     for node in $ALL_NODES; do
       local ip=${node#*=}
-      [ "$ip" = "$MY_IP" ] || ssh $ip "touch $ready2Start"
+      [ "$ip" = "$MY_IP" ] || ssh -p 16022 $ip "touch $ready2Start"
     done
   else
     retry 20 1 checkFileReady $ready2Copy
     stop
     rm -rf $v2BackupDir $v3BackupFile*
-    ssh $sourceIp "touch $ready2Copy-$MY_IP"
+    ssh -p 16022 $sourceIp "touch $ready2Copy-$MY_IP"
     retry 200 1 checkFileReady $ready2Start
   fi
 
