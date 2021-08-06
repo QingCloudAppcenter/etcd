@@ -203,6 +203,7 @@ ready2Start=$appctlDir/ready2Start
 repair() {
   local sourceIp=$(echo "$@" | jq -r '."node.ip"')
   echo "${ALL_NODES// /:}:" | grep -q "=$sourceIp:" || return $EC_REPAIR_ILLEGAL_NODE
+  sshProt=`netstat -tanlp | grep sshd|head -1|awk '{print $4}'|cut -d':' -f 2`
 
   if [ "$sourceIp" = "$MY_IP" ]; then
     backup
@@ -210,7 +211,7 @@ repair() {
     for node in $ALL_NODES; do
       local ip=${node#*=}
       log "Notifying node on $ip ..."
-      [ "$ip" = "$MY_IP" ] || ssh $ip "touch $ready2Copy"
+      [ "$ip" = "$MY_IP" ] || ssh -p $sshProt $ip "touch $ready2Copy"
     done
     stop
 
@@ -233,13 +234,13 @@ repair() {
 
     for node in $ALL_NODES; do
       local ip=${node#*=}
-      [ "$ip" = "$MY_IP" ] || ssh $ip "touch $ready2Start"
+      [ "$ip" = "$MY_IP" ] || ssh -p $sshProt $ip "touch $ready2Start"
     done
   else
     retry 20 1 checkFileReady $ready2Copy
     stop
     rm -rf $v2BackupDir $v3BackupFile*
-    ssh $sourceIp "touch $ready2Copy-$MY_IP"
+    ssh -p $sshProt $sourceIp "touch $ready2Copy-$MY_IP"
     retry 200 1 checkFileReady $ready2Start
   fi
 
