@@ -203,7 +203,7 @@ ready2Start=$appctlDir/ready2Start
 repair() {
   local sourceIp=$(echo "$@" | jq -r '."node.ip"')
   echo "${ALL_NODES// /:}:" | grep -q "=$sourceIp:" || return $EC_REPAIR_ILLEGAL_NODE
-  sshProt=`netstat -tanlp | grep sshd|head -1|awk '{print $4}'|cut -d':' -f 2`
+  sshProt=`netstat -tanlp |grep sshd|grep -v 127.0.0.1|grep 0.0.0.0|head -1|awk '{print $4}'|cut -d':' -f 2`
 
   if [ "$sourceIp" = "$MY_IP" ]; then
     backup
