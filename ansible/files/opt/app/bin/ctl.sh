@@ -70,7 +70,9 @@ start() {
     buildCluster "$ADDED_NODES"
   else
     prepareEtcdConfig
+   if [ "$MY_ROLE" = "etcd-node" ];then
     chown -R etcd.etcd $workingDir #升级时不会调用init所以在这里重新执行
+   fi
     svc start
   fi
 }
