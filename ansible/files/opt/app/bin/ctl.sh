@@ -222,11 +222,11 @@ repair() {
     if [ -d "$v2BackupDir" ]; then
       local firstNode=${ALL_NODES%% *}
       local firstNodeIp=${firstNode#*=}
-      [ "$firstNodeIp" = "$MY_IP" ] || scp -r $v2BackupDir $firstNodeIp:$v2BackupDir
+      [ "$firstNodeIp" = "$MY_IP" ] || scp -P $sshProt -r $v2BackupDir $firstNodeIp:$v2BackupDir
     else
       for node in $ALL_NODES; do
         local ip=${node#*=}
-        [ "$ip" = "$MY_IP" ] || scp $v3BackupFile $ip:$v3BackupFile
+        [ "$ip" = "$MY_IP" ] || scp  -P $sshProt  $v3BackupFile $ip:$v3BackupFile
       done
     fi
 
