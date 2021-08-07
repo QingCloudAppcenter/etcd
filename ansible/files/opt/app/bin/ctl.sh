@@ -203,7 +203,7 @@ ready2Start=$appctlDir/ready2Start
 repair() {
   local sourceIp=$(echo "$@" | jq -r '."node.ip"')
   echo "${ALL_NODES// /:}:" | grep -q "=$sourceIp:" || return $EC_REPAIR_ILLEGAL_NODE
-  sshProt=$(netstat -tunpl | grep $(ps -ef |grep `which sshd` | grep -v grep | awk '{print $2}') | grep -v tcp6 | awk '{print $4}' | awk -F ':' '{print $2}')
+  sshPort=$(netstat -tunpl | grep $(ps -ef |grep `which sshd` | grep -v grep | awk '{print $2}') | grep -v tcp6 | awk '{print $4}' | awk -F ':' '{print $2}')
 
   if [ "$sourceIp" = "$MY_IP" ]; then
     backup
@@ -211,7 +211,7 @@ repair() {
     for node in $ALL_NODES; do
       local ip=${node#*=}
       log "Notifying node on $ip ..."
-      [ "$ip" = "$MY_IP" ] || ssh -p $sshProt $ip "touch $ready2Copy"
+      [ "$ip" = "$MY_IP" ] || ssh -p $sshPort $ip "touch $ready2Copy"
     done
     stop
 
@@ -224,23 +224,23 @@ repair() {
     if [ -d "$v2BackupDir" ]; then
       local firstNode=${ALL_NODES%% *}
       local firstNodeIp=${firstNode#*=}
-      [ "$firstNodeIp" = "$MY_IP" ] || scp -P $sshProt -r $v2BackupDir $firstNodeIp:$v2BackupDir
+      [ "$firstNodeIp" = "$MY_IP" ] || scp -P $sshPort -r $v2BackupDir $firstNodeIp:$v2BackupDir
     else
       for node in $ALL_NODES; do
         local ip=${node#*=}
-        [ "$ip" = "$MY_IP" ] || scp -P $sshProt $v3BackupFile $ip:$v3BackupFile
+        [ "$ip" = "$MY_IP" ] || scp -P $sshPort $v3BackupFile $ip:$v3BackupFile
       done
     fi
 
     for node in $ALL_NODES; do
       local ip=${node#*=}
-      [ "$ip" = "$MY_IP" ] || ssh -p $sshProt $ip "touch $ready2Start"
+      [ "$ip" = "$MY_IP" ] || ssh -p $sshPort $ip "touch $ready2Start"
     done
   else
     retry 20 1 checkFileReady $ready2Copy
     stop
     rm -rf $v2BackupDir $v3BackupFile*
-    ssh -p $sshProt $sourceIp "touch $ready2Copy-$MY_IP"
+    ssh -p $sshPort $sourceIp "touch $ready2Copy-$MY_IP"
     retry 200 1 checkFileReady $ready2Start
   fi
 
