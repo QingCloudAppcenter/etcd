@@ -5,7 +5,7 @@
   "incremental_backup_supported": false,
   "backup_policy": "device",
   "advanced_actions": [ "scale_horizontal" ],
-  "upgrade_policy": ["appv-u2me89o5","appv-fpqnuucx","appv-mclc6o8a","appv-q98yvbp3"],
+  "upgrade_policy": ["appv-u2me89o5","appv-fpqnuucx","appv-mclc6o8a","appv-q98yvbp3","appv-5taat5ql"],
   "upgrading_policy": "sequential",
   "multi_zone_policy": "round_robin",
   "nodes": [{
@@ -13,7 +13,7 @@
     "container": {
       "type": "kvm",
       "zone": "pek3",
-      "image": "img-sqtoinpj"
+      "image": "img-kw2pr9o7"
     },
     "count": {{cluster.etcd_node.count}},
     "instance_class": {{cluster.etcd_node.instance_class}},
@@ -26,6 +26,7 @@
       "mount_options": "defaults,noatime"
     },
     "server_id_upper_bound": 255,
+    "vertical_scaling_policy":"sequential",
     "services": {
       "init": {
         "cmd": "/opt/app/bin/ctl.sh init"
@@ -115,13 +116,14 @@
     "container": {
       "type": "kvm",
       "zone": "pek3",
-      "image": "img-sqtoinpj"
+      "image": "img-kw2pr9o7"
     },
     "count": {{cluster.etcd_proxy.count}},
     "instance_class": {{cluster.etcd_proxy.instance_class}},
     "cpu": {{cluster.etcd_proxy.cpu}},
     "memory": {{cluster.etcd_proxy.memory}},
     "server_id_upper_bound": 255,
+    "vertical_scaling_policy":"sequential",
     "services": {
       "init": {
         "cmd": "/opt/app/bin/ctl.sh init"
