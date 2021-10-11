@@ -41,7 +41,11 @@ buildMembers() {
 
 export ETCDCTL_API=3 
 etcdctl() {
-  ETCDCTL_ENDPOINTS=$(joinArgs $(buildEndpoints)) runCmd /opt/etcd/current/etcdctl $@
+   if [ $ETCDROOTAUTH = "false" ] ;then
+    ETCDCTL_ENDPOINTS=$(joinArgs $(buildEndpoints)) runCmd /opt/etcd/current/etcdctl $@
+   else
+    ETCDCTL_ENDPOINTS=$(joinArgs $(buildEndpoints)) runCmd /opt/etcd/current/etcdctl  --user="root:${ETCDROOTPASSWD}" $@
+   fi
 }
 
 takeBackup() {
@@ -156,3 +160,21 @@ buildCluster() {
 checkStopped() {
   ! svc is-active -q
 }
+
+addEtcdRootUser(){
+     etcdctl user add root
+}
+
+updateEtcdRootUserPasswd(){
+     etcdctl user passwd root
+}
+
+updateEtcdRootAuth(){
+  if [ $ETCDROOTAUTH = "true" ] ;then
+    etcdctl auth enable
+  else
+    etcdctl auth disable
+  fi
+}
+
+

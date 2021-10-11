@@ -185,6 +185,21 @@
         "default": "false",
         "range": ["true", "false"],
         "required": "no"
+      },{
+        "key": "etcdrootauth",
+        "label": "etcd.root.auth",
+        "description": "etcdrootauthdescrip",
+        "type": "string",
+        "default": "false",
+        "range": ["true", "false"],
+        "required": "no"
+      },{
+        "key": "etcdrootpassword",
+        "label": "etcd.root.password",
+        "description": "etcdrootpassworddescrip",
+        "type": "string",
+        "default": "root",
+        "required": "yes"
       }]
     }]
   },{

@@ -1,0 +1,8 @@
+[template]
+src = "etcdrootauth.sh.tmpl"
+dest = "/opt/app/bin/etcdrootauth.sh"
+mode = "0700"
+keys = [
+  "/env/etcdrootauth",
+]
+reload_cmd = "/opt/app/bin/etcdutils.sh updateEtcdrootauth"
