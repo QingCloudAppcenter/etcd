@@ -64,13 +64,6 @@ measure() {
 METRICS_EOF
 }
 
-initEtcdRootauth{
-  #查询是否有root用户，没有就创建
-  addEtcdRootUser
-  #启动时默认根据etcd的是否开启来更新认证，没有权限，根据环境变量的权限进行更新，有权限不做任何操作，升级时是否影响root账户和其他用户和root认证的权限
-  updateEtcdRootAuth
-}
-
 start() {
   log "Etcd service is preparing to start"
   if [ "$MY_ROLE" = "etcd-node" ] && [ "$IS_ADDED" = "true" ]; then
@@ -253,5 +246,19 @@ repair() {
 
   restore
 }
+
+initEtcdRootAuthCtl(){
+  initEtcdRootAuth
+}
+
+updateEtcdRootUserPasswdCtl(){
+  updateEtcdRootUserPasswd $*
+}
+
+updateEtcdRootAuthCtl(){
+  updateEtcdRootAuth
+}
+
+
 
 $command $args

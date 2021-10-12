@@ -13,7 +13,7 @@
     "container": {
       "type": "kvm",
       "zone": "pek3",
-      "image": "img-kw2pr9o7"
+      "image": "img-h1wqvqu8"
     },
     "count": {{cluster.etcd_node.count}},
     "instance_class": {{cluster.etcd_node.instance_class}},
@@ -70,6 +70,22 @@
         "type": "custom",
         "cmd": "/opt/app/bin/ctl.sh compact",
         "timeout": 86400
+      },
+      "initEtcdRootAndAuth": {
+        "nodes_to_execute_on": 1,
+        "type": "custom",
+        "cmd": "/opt/app/bin/ctl.sh initEtcdRootAuthCtl",
+        "timeout": 15
+      },
+      "updateEtcdRootUserPasswd": {
+        "nodes_to_execute_on": 1,
+        "type": "custom",
+        "cmd": "/opt/app/bin/ctl.sh updateEtcdRootUserPasswdCtl",
+        "service_params": {
+           "etcdRootUserOriginalPasswd": {{service_params.etcd_node.etcdRootUserOriginalPasswd}},
+           "etcdRootUserNewPasswd": {{service_params.etcd_node.etcdRootUserNewPasswd}}
+        },
+        "timeout": 15
       }
     },
     "env": {
@@ -118,7 +134,7 @@
     "container": {
       "type": "kvm",
       "zone": "pek3",
-      "image": "img-kw2pr9o7"
+      "image": "img-h1wqvqu8"
     },
     "count": {{cluster.etcd_proxy.count}},
     "instance_class": {{cluster.etcd_proxy.instance_class}},

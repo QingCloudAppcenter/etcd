@@ -217,6 +217,20 @@
         "type": "string",
         "pattern": "(\\d+\\.){3}\\d+",
         "required": "yes"
+      },{
+        "key": "etcdRootUserOriginalPasswd",
+        "label": "etcd.root.original.password",
+        "description": "etcdRootUserOriginalPasswddescrip",
+        "type": "string",
+        "default": "root",
+        "required": "yes"
+      },{
+        "key": "etcdRootUserNewPasswd",
+        "label": "etcd.root.new.password",
+        "description": "etcdrootnewpassworddescrip",
+        "type": "string",
+        "default": "root",
+        "required": "yes"
       }]
     }]
   }]

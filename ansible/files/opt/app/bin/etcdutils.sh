@@ -2,10 +2,13 @@
 
 set -e
 
+. /opt/app/bin/etcdrootauth.sh
+
 etcdDataDir=$workingDir/default.etcd
 etcdEnvFile=/opt/app/conf/etcd.env
 etcdName=etcd$MY_SID
 etcdClusterToken=etcd-$CLUSTER_ID
+etcdrootpasswdfile=/var/lib/etcd/pass.txt
 
 buildMemberName() {
   echo etcd${1:-$MY_SID}
@@ -39,12 +42,31 @@ buildMembers() {
   done
 }
 
+initEtcdRootUserRealPasswd(){
+    echo "etcdRootUserRealPasswd=root" > $etcdrootpasswdfile
+}
+
+getEtcdRootUserRealPasswd(){
+     echo `cat $etcdrootpasswdfile` |tr "=" " "|awk '{print $2}'
+}
+setEtcdRootUserRealPasswd(){
+      echo "etcdRootUserRealPasswd=$*" > $etcdrootpasswdfile
+}
+
+judgeEtcdRootUserPasswd(){
+     if [ $(getEtcdRootUserRealPasswd) = $* ];then
+       return 0
+      else
+       return 1
+      fi
+}
+
 export ETCDCTL_API=3 
 etcdctl() {
    if [ $ETCDROOTAUTH = "false" ] ;then
     ETCDCTL_ENDPOINTS=$(joinArgs $(buildEndpoints)) runCmd /opt/etcd/current/etcdctl $@
    else
-    ETCDCTL_ENDPOINTS=$(joinArgs $(buildEndpoints)) runCmd /opt/etcd/current/etcdctl  --user="root:${ETCDROOTPASSWD}" $@
+    ETCDCTL_ENDPOINTS=$(joinArgs $(buildEndpoints)) runCmd /opt/etcd/current/etcdctl  --user="root:$(getEtcdRootUserRealPasswd)" $@
    fi
 }
 
@@ -161,20 +183,55 @@ checkStopped() {
   ! svc is-active -q
 }
 
+
+queryEtcdRootUser(){
+  etcdctl user get root
+}
+
 addEtcdRootUser(){
-     etcdctl user add root
+     etcdctl user add root <<END
+root
+root
+END
 }
 
 updateEtcdRootUserPasswd(){
-     etcdctl user passwd root
+     etcdRootUserOriginalPasswd="$(echo $* |jq -r .etcdRootUserOriginalPasswd)"
+     judgeEtcdRootUserPasswd $etcdRootUserOriginalPasswd || return 1 #输入原始密码错误
+
+     etcdRootUserNewPasswd="$(echo $* |jq -r .etcdRootUserNewPasswd)"
+     etcdctl   user passwd root <<END
+${etcdRootUserNewPasswd}
+${etcdRootUserNewPasswd}
+END
+     if [ $? -eq 0 ];then
+       setEtcdRootUserRealPasswd $etcdRootUserNewPasswd
+     fi
+
 }
 
 updateEtcdRootAuth(){
+   judgeEtcdRootUserPasswd $ETCDROOTPASSWD || return 1 #输入原始密码错误
+
   if [ $ETCDROOTAUTH = "true" ] ;then
     etcdctl auth enable
   else
     etcdctl auth disable
   fi
 }
+
+initEtcdRootAuth(){
+   #文件内容为空就初始话密码
+  if [ ! -s $etcdrootpasswdfile ];then
+    initEtcdRootUserRealPasswd
+  fi
+   #查询是否有root用户，没有就创建
+  queryEtcdRootUser || addEtcdRootUser
+  #启动时默认根据etcd的是否开启来更新认证，没有权限，根据环境变量的权限进行更新，有权限不做任何操作，升级时是否影响root账户和其他用户和root认证的权限
+  updateEtcdRootAuth
+}
+
+
+
 
 

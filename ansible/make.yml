@@ -50,6 +50,11 @@
           src: files/etc/confd/conf.d/nodeexporter.sh.toml
           dest: /etc/confd/conf.d/nodeexporter.sh.toml
 
+    - name: Copy confd etcdrootauth.sh.toml files
+      copy:
+          src: files/etc/confd/conf.d/etcdrootauth.sh.toml
+          dest: /etc/confd/conf.d/etcdrootauth.sh.toml
+
     - name: Compile tmpl files
       raw: |
           srcDir=files/etc/confd
@@ -73,6 +78,11 @@
       copy:
         src: files/etc/confd/templates/nodeexporter.sh.tmpl
         dest: /etc/confd/templates/nodeexporter.sh.tmpl
+
+    - name: Copy confd etcdrootauth.sh.tmpl files
+      copy:
+          src: files/etc/confd/templates/etcdrootauth.sh.tmpl
+          dest: /etc/confd/templates/etcdrootauth.sh.tmpl
 
     - name: Prepare directories
       file:
