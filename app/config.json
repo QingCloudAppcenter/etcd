@@ -194,9 +194,9 @@
         "range": ["true", "false"],
         "required": "no"
       },{
-        "key": "etcdrootpassword",
-        "label": "etcd.root.password",
-        "description": "etcdrootpassworddescrip",
+        "key": "etcdrootpasswd",
+        "label": "etcd.root.passwd",
+        "description": "etcdrootpasswddescrip",
         "type": "string",
         "default": "root",
         "required": "yes"
