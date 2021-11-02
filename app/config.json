@@ -83,8 +83,8 @@
         "label": "InstanceClassLabel",
         "description": "InstanceClassDescrip",
         "type": "integer",
-        "default": 1,
-        "range": [0, 1],
+        "default": 202,
+        "range": [101, 202],
         "required": "yes"
       }, {
         "key": "volume_size",
@@ -145,8 +145,8 @@
         "label": "InstanceClassLabel",
         "description": "InstanceClassDescrip",
         "type": "integer",
-        "default": 1,
-        "range": [0, 1],
+        "default": 202,
+        "range": [101, 202],
         "required": "yes"
       }]
     }]
