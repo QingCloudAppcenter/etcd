@@ -38,6 +38,13 @@ updateNodeexporterServer(){
 }
 
 init() {
+    if [ "$MY_ROLE" = "etcd-node" ] && [ "$IS_ADDED" != "true" ]; then
+     updateEtcdAuth
+    fi
+}
+
+
+initETCDenv() {
   [ "$MY_ROLE" = "etcd-proxy" ] || {
     rm -rf $workingDir/lost+found
     mkdir -p $appctlDir
@@ -65,13 +72,14 @@ METRICS_EOF
 }
 
 start() {
+  initETCDenv
   log "Etcd service is preparing to start"
   if [ "$MY_ROLE" = "etcd-node" ] && [ "$IS_ADDED" = "true" ]; then
     buildCluster "$ADDED_NODES"
   else
     prepareEtcdConfig
    if [ "$MY_ROLE" = "etcd-node" ];then
-    chown -R etcd.etcd $workingDir #升级时不会调用init所以在这里重新执行
+    chown -R etcd.etcd $workingDir #升级时不会调用initETCDenv所以在这里重新执行
    fi
     svc start
   fi
@@ -120,7 +128,7 @@ backup() {
 }
 
 restore() {
-  rm -rf $etcdDataDir && sleep 1 && init
+  rm -rf $etcdDataDir && sleep 1 && initETCDenv
   prepareEtcdConfig
   if [ -f "$v3BackupFile" ]; then
     restoreSnap $v3BackupFile
@@ -155,7 +163,7 @@ restart() {
 
 upgrade() {
   # 先升级至当前次版本号对应的最新修订版本号以规避升级bug，后升级至目标版本
-  init
+  initETCDenv
    
   log "Etcd service is prepared to upgrade to $etcdVersion"
   local sleepMaxTime=0
@@ -173,7 +181,7 @@ upgrade() {
   #rm -rf /opt/etcd/current
   #ln -s /opt/etcd/$etcdVersion /opt/etcd/current
   
-  #init
+  #initETCDenv
   #curl -L $(buildClientUrls)/version >>/root/a.txt || echo
   #start
 }
@@ -247,18 +255,13 @@ repair() {
   restore
 }
 
-initEtcdRootAuthCtl(){
-  initEtcdRootAuth
+updateEtcdAuthCtl(){
+  updateEtcdAuth
 }
 
-updateEtcdRootUserPasswdCtl(){
-  updateEtcdRootUserPasswd $*
+updateEtcdPasswdCtl(){
+  updateEtcdPasswd
 }
-
-updateEtcdRootAuthCtl(){
-  updateEtcdRootAuth
-}
-
 
 
 $command $args

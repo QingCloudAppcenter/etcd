@@ -52,5 +52,11 @@
   "corednslb": "coredns负载均衡器",
   "corednslbdescript": "给coredns服务的负载均衡器，端口为53",
   "nodeexporterdescrip": "开启nodeexporter,可以监控服务器CPU、内存、磁盘、I/O等信息,Node Exporter默认的抓取地址为：http://IP:9100/metrics,每个节点有自己的单独的Node Exporter",
-  "node.exporter": "node_exporter"
+  "node.exporter": "node_exporter",
+  "etcd.default.user": "etcd default-user",
+  "etcduserdescrip": "默认为etcd创建root用户，且不可修改",
+  "etcd.default.passwd": "etcd default-passwd",
+  "etcdpasswddescrip": "为etcd创建root用户的密码，可以修改，默认密码为root；集群创建好之后输入新的密码会覆盖原密码",
+  "etcd.auth": "etcd auth",
+  "etcdauthdescrip": "关闭、开启用户认证"
 }

@@ -2,13 +2,14 @@
 
 set -e
 
-. /opt/app/bin/etcdrootauth.sh
+. /opt/app/bin/etcdauth.sh
 
 etcdDataDir=$workingDir/default.etcd
 etcdEnvFile=/opt/app/conf/etcd.env
 etcdName=etcd$MY_SID
 etcdClusterToken=etcd-$CLUSTER_ID
-etcdrootpasswdfile=/var/lib/etcd/pass.txt
+etcdAuthPasswdFile=$workingDir/etcdAuthPasswd.txt
+
 
 buildMemberName() {
   echo etcd${1:-$MY_SID}
@@ -42,31 +43,14 @@ buildMembers() {
   done
 }
 
-initEtcdRootUserRealPasswd(){
-    echo "etcdRootUserRealPasswd=root" > $etcdrootpasswdfile
-}
 
-getEtcdRootUserRealPasswd(){
-     echo `cat $etcdrootpasswdfile` |tr "=" " "|awk '{print $2}'
-}
-setEtcdRootUserRealPasswd(){
-      echo "etcdRootUserRealPasswd=$*" > $etcdrootpasswdfile
-}
-
-judgeEtcdRootUserPasswd(){
-     if [ $(getEtcdRootUserRealPasswd) = $* ];then
-       return 0
-      else
-       return 1
-      fi
-}
 
 export ETCDCTL_API=3 
 etcdctl() {
-   if [ $ETCDROOTAUTH = "false" ] ;then
+   if [ $ETCDAUTH = "false" ] ;then
     ETCDCTL_ENDPOINTS=$(joinArgs $(buildEndpoints)) runCmd /opt/etcd/current/etcdctl $@
    else
-    ETCDCTL_ENDPOINTS=$(joinArgs $(buildEndpoints)) runCmd /opt/etcd/current/etcdctl  --user="root:$(getEtcdRootUserRealPasswd)" $@
+    ETCDCTL_ENDPOINTS=$(joinArgs $(buildEndpoints)) runCmd /opt/etcd/current/etcdctl  --user="${ETCDDEFAULTUSER}:${ETCDDEFAULTPASSWD}" $@
    fi
 }
 
@@ -184,52 +168,50 @@ checkStopped() {
 }
 
 
-queryEtcdRootUser(){
-  etcdctl user get root
+updateEtcdPasswdFile(){
+  echo "EtcdRootOriginalPasswd=${ETCDDEFAULTPASSWD}">$etcdAuthPasswdFile
 }
 
-addEtcdRootUser(){
-     etcdctl user add root <<END
-root
-root
+updateEtcdPasswd(){
+  EtcdRootOriginalPasswd=`cat $etcdAuthPasswdFile |tr '=' ' '|awk '{print $2}'`
+  ETCDCTL_ENDPOINTS=$(joinArgs $(buildEndpoints)) runCmd /opt/etcd/current/etcdctl  --user="${ETCDDEFAULTUSER}:${EtcdRootOriginalPasswd}" user passwd root <<END
+${ETCDDEFAULTPASSWD}
+${ETCDDEFAULTPASSWD}
+END
+  updateEtcdPasswdFile
+}
+
+etcdctlReverse() {
+   if [ $ETCDAUTH = "true" ] ;then
+    ETCDCTL_ENDPOINTS=$(joinArgs $(buildEndpoints)) runCmd /opt/etcd/current/etcdctl $@
+   else
+    ETCDCTL_ENDPOINTS=$(joinArgs $(buildEndpoints)) runCmd /opt/etcd/current/etcdctl  --user="${ETCDDEFAULTUSER}:${ETCDDEFAULTPASSWD}" $@
+   fi
+}
+
+isExistEtcdDefaultUser(){
+   etcdctlReverse user get ${ETCDDEFAULTUSER}
+}
+
+addEtcdDefaultUser(){
+     etcdctlReverse user add ${ETCDDEFAULTUSER} <<END
+${ETCDDEFAULTPASSWD}
+${ETCDDEFAULTPASSWD}
 END
 }
 
-updateEtcdRootUserPasswd(){
-     etcdRootUserOriginalPasswd="$(echo $* |jq -r .etcdRootUserOriginalPasswd)"
-     judgeEtcdRootUserPasswd $etcdRootUserOriginalPasswd || return 1 #输入原始密码错误
 
-     etcdRootUserNewPasswd="$(echo $* |jq -r .etcdRootUserNewPasswd)"
-     etcdctl   user passwd root <<END
-${etcdRootUserNewPasswd}
-${etcdRootUserNewPasswd}
-END
-     if [ $? -eq 0 ];then
-       setEtcdRootUserRealPasswd $etcdRootUserNewPasswd
-     fi
-
-}
-
-updateEtcdRootAuth(){
-   judgeEtcdRootUserPasswd $ETCDROOTPASSWD || return 1 #输入原始密码错误
-
-  if [ $ETCDROOTAUTH = "true" ] ;then
-    etcdctl auth enable
-  else
-    etcdctl auth disable
-  fi
-}
-
-initEtcdRootAuth(){
-   #文件内容为空就初始话密码
-  if [ ! -s $etcdrootpasswdfile ];then
-    initEtcdRootUserRealPasswd
-  fi
+updateEtcdAuth(){
    #查询是否有root用户，没有就创建
-  queryEtcdRootUser || addEtcdRootUser
-  #启动时默认根据etcd的是否开启来更新认证，没有权限，根据环境变量的权限进行更新，有权限不做任何操作，升级时是否影响root账户和其他用户和root认证的权限
-  updateEtcdRootAuth
+  isExistEtcdDefaultUser || addEtcdDefaultUser
+  updateEtcdPasswdFile
+  if [ $ETCDAUTH = "true" ] ;then
+    etcdctlReverse auth enable
+  else
+    etcdctlReverse auth disable
+  fi
 }
+
 
 
 

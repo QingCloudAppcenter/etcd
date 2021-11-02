@@ -13,7 +13,7 @@
     "container": {
       "type": "kvm",
       "zone": "pek3",
-      "image": "img-h1wqvqu8"
+      "image": "img-bwee38ps"
     },
     "count": {{cluster.etcd_node.count}},
     "instance_class": {{cluster.etcd_node.instance_class}},
@@ -29,6 +29,8 @@
     "vertical_scaling_policy":"sequential",
     "services": {
       "init": {
+        "nodes_to_execute_on": 1,
+        "post_start_service": true,
         "cmd": "/opt/app/bin/ctl.sh init"
       },
       "start": {
@@ -70,30 +72,15 @@
         "type": "custom",
         "cmd": "/opt/app/bin/ctl.sh compact",
         "timeout": 86400
-      },
-      "initEtcdRootAndAuth": {
-        "nodes_to_execute_on": 1,
-        "type": "custom",
-        "cmd": "/opt/app/bin/ctl.sh initEtcdRootAuthCtl",
-        "timeout": 15
-      },
-      "updateEtcdRootUserPasswd": {
-        "nodes_to_execute_on": 1,
-        "type": "custom",
-        "cmd": "/opt/app/bin/ctl.sh updateEtcdRootUserPasswdCtl",
-        "service_params": {
-           "etcdRootUserOriginalPasswd": {{service_params.etcd_node.etcdRootUserOriginalPasswd}},
-           "etcdRootUserNewPasswd": {{service_params.etcd_node.etcdRootUserNewPasswd}}
-        },
-        "timeout": 15
       }
     },
     "env": {
       "etcautocompact": {{env.etcd_node.autocompact}},
       "etcd.quota.backend.bytes": {{env.etcd_node.quotabytes}},
       "nodeexporter": {{env.etcd_node.nodeexporter}},
-      "etcdrootauth": {{env.etcd_node.etcdrootauth}},
-      "etcdrootpasswd": {{env.etcd_node.etcdrootpasswd}}
+      "etcdauth": {{env.etcd_node.etcd_auth}},
+      "etcddefaultuser": {{env.etcd_node.etcd_default_user}},
+      "etcddefaultpasswd": {{env.etcd_node.etcd_default_passwd}}
     },
     "monitor": {
       "enable": true,
@@ -134,7 +121,7 @@
     "container": {
       "type": "kvm",
       "zone": "pek3",
-      "image": "img-h1wqvqu8"
+      "image": "img-bwee38ps"
     },
     "count": {{cluster.etcd_proxy.count}},
     "instance_class": {{cluster.etcd_proxy.instance_class}},

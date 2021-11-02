@@ -186,20 +186,30 @@
         "range": ["true", "false"],
         "required": "no"
       },{
-        "key": "etcdrootauth",
-        "label": "etcd.root.auth",
-        "description": "etcdrootauthdescrip",
+        "key": "etcd_default_user",
+        "label": "etcd.default.user",
+        "description": "etcduserdescrip",
+        "type": "string",
+        "default": "root",
+        "required": "yes",
+        "range": ["root"],
+        "changeable": false
+        },{
+        "key": "etcd_default_passwd",
+        "label": "etcd.default.passwd",
+        "description": "etcdpasswddescrip",
+        "type": "password",
+        "default": "root",
+        "required": "yes"
+      },{
+        "key": "etcd_auth",
+        "label": "etcd.auth",
+        "description": "etcdauthdescrip",
         "type": "string",
         "default": "false",
         "range": ["true", "false"],
-        "required": "no"
-      },{
-        "key": "etcdrootpasswd",
-        "label": "etcd.root.passwd",
-        "description": "etcdrootpasswddescrip",
-        "type": "string",
-        "default": "root",
-        "required": "yes"
+        "required": "no",
+        "expanded": false
       }]
     }]
   },{
@@ -216,20 +226,6 @@
         "description": "The node IP of etcd from which to take data",
         "type": "string",
         "pattern": "(\\d+\\.){3}\\d+",
-        "required": "yes"
-      },{
-        "key": "etcdRootUserOriginalPasswd",
-        "label": "etcd.root.original.password",
-        "description": "etcdRootUserOriginalPasswddescrip",
-        "type": "string",
-        "default": "root",
-        "required": "yes"
-      },{
-        "key": "etcdRootUserNewPasswd",
-        "label": "etcd.root.new.password",
-        "description": "etcdrootnewpassworddescrip",
-        "type": "string",
-        "default": "root",
         "required": "yes"
       }]
     }]
