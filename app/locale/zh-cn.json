@@ -24,7 +24,7 @@
   "VolumeSizelabel": "硬盘容量",
   "etcd_node": "etcd服务",
   "etcd_proxy": "etcd代理",
-  "InstanceClassDescrip": "虚拟机实例的类型,如性能型，超高性能型",
+  "InstanceClassDescrip": "虚拟机实例的类型,如基础型，企业型",
   "InstanceClassLabel": "实例类型",
   "compact": "清理历史数据",
   "etcautocompact": "etcd autocompact",
