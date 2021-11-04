@@ -143,6 +143,7 @@ restore() {
       log "Starting etcd restore service ..."
       systemctl start etcd-standalone
       log "Updating my peer url ..."
+      sleep 3 #是为了等待其他相同节点启动起来
       local myMemberId
       myMemberId=$(findMemberId localhost $MY_IP)
       retry 10 1 etcdctl  member update $myMemberId --peer-urls=$(buildMemberUrls) || {
