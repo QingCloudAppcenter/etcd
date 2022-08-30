@@ -5,7 +5,7 @@
   "incremental_backup_supported": false,
   "backup_policy": "device",
   "advanced_actions": [ "scale_horizontal" ],
-  "upgrade_policy": ["appv-u2me89o5","appv-fpqnuucx","appv-mclc6o8a","appv-q98yvbp3","appv-5taat5ql","appv-jzhr30i8"],
+  "upgrade_policy": ["appv-u2me89o5","appv-fpqnuucx","appv-mclc6o8a","appv-q98yvbp3","appv-5taat5ql","appv-jzhr30i8","appv-h1n2681n"],
   "upgrading_policy": "sequential",
   "multi_zone_policy": "round_robin",
   "nodes": [{
@@ -13,7 +13,7 @@
     "container": {
       "type": "kvm",
       "zone": "pek3",
-      "image": "img-ei7kud0r"
+      "image": "img-oa06y5tj"
     },
     "count": {{cluster.etcd_node.count}},
     "instance_class": {{cluster.etcd_node.instance_class}},
@@ -60,11 +60,19 @@
       "restore": {
         "cmd": "/opt/app/bin/ctl.sh restore"
       },
-      "repair": {
+      "repairMajorityNode": {
         "type": "custom",
         "cmd": "/opt/app/bin/ctl.sh repair",
         "service_params": {
           "node.ip": {{service_params.etcd_node.node.ip}}
+        }
+      },
+      "repairMinorityNode": {
+        "type": "custom",
+        "cmd": "/opt/app/bin/ctl.sh repairMinorityNode",
+        "service_params": {
+          "healthnode.ip": {{service_params.etcd_node.healthnode.ip}},
+          "unhealthnode.ip": {{service_params.etcd_node.unhealthnode.ip}}
         }
       },
       "compact": {
@@ -78,9 +86,10 @@
       "etcautocompact": {{env.etcd_node.autocompact}},
       "etcd.quota.backend.bytes": {{env.etcd_node.quotabytes}},
       "nodeexporter": {{env.etcd_node.nodeexporter}},
-      "etcdauth": {{env.etcd_node.etcd_auth}},
-      "etcddefaultuser": {{env.etcd_node.etcd_default_user}},
-      "etcddefaultpasswd": {{env.etcd_node.etcd_default_passwd}}
+      "enable_TLS": {{env.etcd_node.enable_TLS}},
+      "cluster_DNS": {{env.etcd_node.cluster_DNS}},
+      "etcdheartbeatinterval": {{env.etcd_node.etcd_heartbeat_interval}},
+      "etcdelectiontimeout": {{env.etcd_node.etcd_election_timeout}}
     },
     "monitor": {
       "enable": true,
@@ -98,7 +107,7 @@
         "etcd_network_peer_sent_bytes_total": {
           "statistics_type": "latest"
         },
-        "http_requests_total": {
+        "etcd_server_proposals_failed_total": {
           "statistics_type": "latest"
         },
         "process_resident_memory_bytes": {
@@ -113,7 +122,7 @@
         "data": ["etcd_network_peer_sent_bytes_total"],
         "memory": ["process_resident_memory_bytes", "process_virtual_memory_bytes"]
       },
-      "display": ["state", "data", "memory", "http_requests_total"],
+      "display": ["state", "data", "memory", "etcd_server_proposals_failed_total"],
       "alarm": ["etcd_server_has_leader"]
     }
   }, {
@@ -121,7 +130,7 @@
     "container": {
       "type": "kvm",
       "zone": "pek3",
-      "image": "img-ei7kud0r"
+      "image": "img-oa06y5tj"
     },
     "count": {{cluster.etcd_proxy.count}},
     "instance_class": {{cluster.etcd_proxy.instance_class}},
@@ -147,7 +156,9 @@
       }
     },
     "env": {
-          "nodeexporter": {{env.etcd_node.nodeexporter}}
+          "nodeexporter": {{env.etcd_node.nodeexporter}},
+          "enable_TLS": {{env.etcd_node.enable_TLS}},
+          "cluster_DNS": {{env.etcd_node.cluster_DNS}}
     }
   }],
   "health_check": {
@@ -163,7 +174,15 @@
   "endpoints": {
     "client": {
       "port": 2379,
-      "protocol": "http"
+      "protocol": "根据是否开启TLS选择http还是https"
     }
-  }
+  },
+  "display_tabs": {
+      "TLSConnectionGuide-column": {
+        "cmd": "/opt/app/bin/ctl.sh getAccessCertificate",
+        "roles_to_execute_on": ["etcd_node"],
+        "description": "TLSConnectionGuideDescrip",
+        "timeout": 10
+      }
+    }
 }

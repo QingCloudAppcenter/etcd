@@ -50,10 +50,16 @@
           src: files/etc/confd/conf.d/nodeexporter.sh.toml
           dest: /etc/confd/conf.d/nodeexporter.sh.toml
 
-    - name: Copy confd etcdauth.sh.toml files
+#    - name: Copy confd etcdauth.sh.toml files
+#      copy:
+#          src: files/etc/confd/conf.d/etcdauth.sh.toml
+#          dest: /etc/confd/conf.d/etcdauth.sh.toml
+
+
+    - name: Copy confd tls.sh.toml files
       copy:
-          src: files/etc/confd/conf.d/etcdauth.sh.toml
-          dest: /etc/confd/conf.d/etcdauth.sh.toml
+        src: files/etc/confd/conf.d/tls.sh.toml
+        dest: /etc/confd/conf.d/tls.sh.toml
 
     - name: Compile tmpl files
       raw: |
@@ -79,10 +85,15 @@
         src: files/etc/confd/templates/nodeexporter.sh.tmpl
         dest: /etc/confd/templates/nodeexporter.sh.tmpl
 
-    - name: Copy confd etcdauth.sh.tmpl files
+#    - name: Copy confd etcdauth.sh.tmpl files
+#      copy:
+#          src: files/etc/confd/templates/etcdauth.sh.tmpl
+#          dest: /etc/confd/templates/etcdauth.sh.tmpl
+
+    - name: Copy confd tls.sh.tmpl files
       copy:
-          src: files/etc/confd/templates/etcdauth.sh.tmpl
-          dest: /etc/confd/templates/etcdauth.sh.tmpl
+          src: files/etc/confd/templates/tls.sh.tmpl
+          dest: /etc/confd/templates/tls.sh.tmpl
 
     - name: Prepare directories
       file:
@@ -118,6 +129,27 @@
         src: "/opt/etcd/{{ etcdVersion2 }}"
         dest: "/opt/etcd/current"
         state: link
+
+    - name: Download install cfssl tools
+      get_url:
+        url: "https://pkg.cfssl.org/R1.2/{{ item }}"
+        dest: /usr/local/bin
+        mode: 0755
+        owner: root
+      delegate_to: localhost
+      with_items:
+        - "cfssl_linux-amd64"
+        - "cfssljson_linux-amd64"
+        - "cfssl-certinfo_linux-amd64"
+
+    - name: Move cfssl_linux-amd64 to cfssl
+      command: mv /usr/local/bin/cfssl_linux-amd64  /usr/local/bin/cfssl
+
+    - name: Move cfssljson_linux-amd64 to cfssljson
+      command: mv /usr/local/bin/cfssljson_linux-amd64  /usr/local/bin/cfssljson
+
+    - name: Move cfssl-certinfo_linux-amd64 to cfssl-certinfo
+      command: mv /usr/local/bin/cfssl-certinfo_linux-amd64  /usr/local/bin/cfssl-certinfo
 
     - name: Copy systemd files
       copy:

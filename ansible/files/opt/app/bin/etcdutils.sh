@@ -2,13 +2,13 @@
 
 set -e
 
-. /opt/app/bin/etcdauth.sh
+#. /opt/app/bin/etcdauth.sh
 
 etcdDataDir=$workingDir/default.etcd
 etcdEnvFile=/opt/app/conf/etcd.env
 etcdName=etcd$MY_SID
 etcdClusterToken=etcd-$CLUSTER_ID
-etcdAuthPasswdFile=$workingDir/etcdAuthPasswd.txt
+#etcdAuthPasswdFile=$workingDir/etcdAuthPasswd.txt
 
 
 buildMemberName() {
@@ -16,46 +16,110 @@ buildMemberName() {
 }
 
 buildClientUrls() {
-  echo http://${1:-$MY_IP}:2379
+  if [ $ENABLE_TLS = "true" ]; then
+     echo https://${1:-$MY_IP}:2379
+  else
+     echo http://${1:-$MY_IP}:2379
+  fi
+}
+
+buildClientDomainUrls() {
+  if [ $ENABLE_TLS = "true" ]; then
+     echo https://${1:-etcd${MY_SID}${ETCD_CLUSTER_DNS}}:2379
+  else
+     echo http://${1:-$MY_IP}:2379
+  fi
 }
 
 buildMemberUrls() {
-  echo http://${1:-$MY_IP}:2380
+  if [ $ENABLE_TLS = "true" ]; then
+     echo https://${1:-$MY_IP}:2380
+  else
+     echo http://${1:-$MY_IP}:2380
+  fi
+}
+
+buildMemberDomainUrls() {
+  if [ $ENABLE_TLS = "true" ]; then
+     echo https://${1:-etcd${MY_SID}${ETCD_CLUSTER_DNS}}:2380
+  else
+     echo http://${1:-$MY_IP}:2380
+  fi
 }
 
 buildMember() {
-  echo "$(buildMemberName ${1%=*})=$(buildMemberUrls ${1#*=})"
+  if [ $ENABLE_TLS = "true" ]; then
+     echo "$(buildMemberName ${1%=*})=$(buildMemberDomainUrls ${1#*=})"
+  else
+     echo "$(buildMemberName ${1%=*})=$(buildMemberUrls ${1#*=})"
+  fi
+
 }
 
 buildEndpoints() {
-  for node in $STABLE_NODES; do
-    echo "$(buildClientUrls ${node#*=})"
-    [ "$1" = "existing" ] && [ "$node" = "$MY_SID=$MY_IP" ] && break
-  done
+  if [ $ENABLE_TLS = "true" ]; then
+    for node in $STABLE_NODES_DOMAIN_NAME; do
+      echo "$(buildClientUrls ${node#*=})"
+      [ "$1" = "existing" ] && [ "$node" = "$MY_SID=etcd${MY_SID}${ETCD_CLUSTER_DNS}" ] && break
+    done
+  else
+    for node in $STABLE_NODES; do
+      echo "$(buildClientUrls ${node#*=})"
+      [ "$1" = "existing" ] && [ "$node" = "$MY_SID=$MY_IP" ] && break
+    done
+  fi
 }
 
 buildMembers() {
   local nodes
-  nodes="$(echo $STABLE_NODES) $(echo $ADDED_NODES)"
+  if [ $ENABLE_TLS = "true" ]; then
+    nodes="$(echo $STABLE_NODES_DOMAIN_NAME) $(echo $ADDED_NODES_DOMAIN)"
+    for node in ${2:-$nodes}; do
+      echo "$(buildMember $node)"
+      [ "$1" = "existing" ] && [ "$node" = "$MY_SID=etcd${MY_SID}${ETCD_CLUSTER_DNS}" ] && break
+    done
+  else
+    nodes="$(echo $STABLE_NODES) $(echo $ADDED_NODES)"
+    for node in ${2:-$nodes}; do
+      echo "$(buildMember $node)"
+      [ "$1" = "existing" ] && [ "$node" = "$MY_SID=$MY_IP" ] && break
+    done
+  fi
+}
+
+buildMembersDomain() {
+  local nodes
+  nodes="$(echo $STABLE_NODES_DOMAIN_NAME) $(echo $ADDED_NODES_DOMAIN)"
   for node in ${2:-$nodes}; do
     echo "$(buildMember $node)"
-    [ "$1" = "existing" ] && [ "$node" = "$MY_SID=$MY_IP" ] && break
+    [ "$1" = "existing" ] && [ "$node" = "$MY_SID=etcd${MY_SID}${ETCD_CLUSTER_DNS}" ] && break
   done
 }
 
+etcdctlInitFun() {
+  if [ $ENABLE_TLS = "true" ]; then
+     echo "/opt/etcd/current/etcdctl  --cert=/var/lib/etcd/ssl/etcd/client.pem  --key=/var/lib/etcd/ssl/etcd/client-key.pem  --cacert=/var/lib/etcd/ssl/etcd/ca.pem"
+  else
+     echo "/opt/etcd/current/etcdctl"
+  fi
+}
 
-
-export ETCDCTL_API=3 
+export ETCDCTL_API=3
 etcdctl() {
-   if [ $ETCDAUTH = "false" ] ;then
-    ETCDCTL_ENDPOINTS=$(joinArgs $(buildEndpoints)) runCmd /opt/etcd/current/etcdctl $@
-   else
-    ETCDCTL_ENDPOINTS=$(joinArgs $(buildEndpoints)) runCmd /opt/etcd/current/etcdctl  --user="${ETCDDEFAULTUSER}:${ETCDDEFAULTPASSWD}" $@
-   fi
+   etcdctlInit=$(etcdctlInitFun)
+#   if [ $ETCDAUTH = "false" ] ;then
+   ETCDCTL_ENDPOINTS=$(joinArgs $(buildEndpoints)) runCmd  $etcdctlInit $@
+#   else
+#    ETCDCTL_ENDPOINTS=$(joinArgs $(buildEndpoints)) runCmd $etcdctlInit  --user="${ETCDDEFAULTUSER}:${ETCDDEFAULTPASSWD}" $@
+#   fi
 }
 
 takeBackup() {
-  ETCDCTL_API=2 runCmd /opt/etcd/v3.4.16/etcdctl backup --data-dir=$etcdDataDir --backup-dir=$1 --with-v3
+  local etcdctlInit=$(etcdctlInitFun)
+  if [ $ENABLE_TLS = "true" ]; then
+     etcdctlInit=`echo ${etcdctlInit}|sed "s/--cert/--cert-file/g"|sed "s/--key/--key-file/g"|sed "s/--cacert/--ca-file/g"`
+  fi
+  ETCDCTL_API=2 runCmd $etcdctlInit backup --data-dir=$etcdDataDir --backup-dir=$1 --with-v3
 }
 
 takeSnap() {
@@ -80,17 +144,55 @@ svc() {
 
 prepareEtcdConfig() {
   if [ "$MY_ROLE" = "etcd-proxy" ]; then
-    cat > $etcdEnvFile << PROXY_ENV_FILE_EOF
+    if [ $ENABLE_TLS = "true" ]; then
+      cat > $etcdEnvFile << PROXY_ENV_FILE_EOF
+etcdOpts="gateway start --listen-addr=proxy${MY_SID}${ETCD_CLUSTER_DNS}:2379 --endpoints=$(joinArgs $(buildEndpoints))"
+PROXY_ENV_FILE_EOF
+      return 0
+    else
+      cat > $etcdEnvFile << PROXY_ENV_FILE_EOF
 etcdOpts="gateway start --listen-addr=$MY_IP:2379 --endpoints=$(joinArgs $(buildEndpoints))"
 PROXY_ENV_FILE_EOF
-    return 0
+      return 0
+    fi
   fi
 
   local state=${1:-new} members
-  members="$(joinArgs $(buildMembers $state))"
+  if [ $ENABLE_TLS = "true" ]; then
+    members="$(joinArgs $(buildMembersDomain $state))"
+  else
+    members="$(joinArgs $(buildMembers $state))"
+  fi
   members="$(echo $members)"
 
-  cat > $etcdEnvFile << ETCD_ENV_FILE_EOF
+  if [ $ENABLE_TLS = "true" ]; then
+    cat > $etcdEnvFile << ETCD_ENV_FILE_EOF
+ETCD_NAME=$etcdName
+ETCD_DATA_DIR=$etcdDataDir
+ETCD_LISTEN_PEER_URLS=$(buildMemberUrls)
+ETCD_LISTEN_CLIENT_URLS=$(buildClientUrls)
+ETCD_INITIAL_ADVERTISE_PEER_URLS=$(buildMemberDomainUrls)
+ETCD_ADVERTISE_CLIENT_URLS=$(buildClientDomainUrls)
+ETCD_INITIAL_CLUSTER=${members// /,}
+ETCD_INITIAL_CLUSTER_TOKEN=$etcdClusterToken
+ETCD_AUTO_COMPACTION_RETENTION=$ETCD_COMPACT_INTERVAL
+ETCD_AUTO_COMPACTION_MODE=$ETCD_AUTO_COMPACTION_MODE
+ETCD_QUOTA_BACKEND_BYTES=$ETCD_QUOTA_BYTES
+ETCD_HEARTBEAT_INTERVAL=$ETCD_HEARTBEAT_INTERVAL
+ETCD_ELECTION_TIMEOUT=$ETCD_ELECTION_TIMEOUT
+ETCD_INITIAL_CLUSTER_STATE=$state
+ETCD_ENABLE_V2=$ETCD_ENABLE_V2
+ETCD_CERT_FILE=/var/lib/etcd/ssl/etcd/server.pem
+ETCD_KEY_FILE=/var/lib/etcd/ssl/etcd/server-key.pem
+ETCD_PEER_CERT_FILE=/var/lib/etcd/ssl/etcd/peer.pem
+ETCD_PEER_KEY_FILE=/var/lib/etcd/ssl/etcd/peer-key.pem
+ETCD_TRUSTED_CA_FILE=/var/lib/etcd/ssl/etcd/ca.pem
+ETCD_PEER_TRUSTED_CA_FILE=/var/lib/etcd/ssl/etcd/ca.pem
+ETCD_PEER_CLIENT_CERT_AUTH=true
+ETCD_CLIENT_CERT_AUTH=true
+ETCD_ENV_FILE_EOF
+  else
+    cat > $etcdEnvFile << ETCD_ENV_FILE_EOF
 ETCD_NAME=$etcdName
 ETCD_DATA_DIR=$etcdDataDir
 ETCD_LISTEN_PEER_URLS=$(buildMemberUrls)
@@ -102,21 +204,29 @@ ETCD_INITIAL_CLUSTER_TOKEN=$etcdClusterToken
 ETCD_AUTO_COMPACTION_RETENTION=$ETCD_COMPACT_INTERVAL
 ETCD_AUTO_COMPACTION_MODE=$ETCD_AUTO_COMPACTION_MODE
 ETCD_QUOTA_BACKEND_BYTES=$ETCD_QUOTA_BYTES
+ETCD_HEARTBEAT_INTERVAL=$ETCD_HEARTBEAT_INTERVAL
+ETCD_ELECTION_TIMEOUT=$ETCD_ELECTION_TIMEOUT
 ETCD_INITIAL_CLUSTER_STATE=$state
 ETCD_ENABLE_V2=$ETCD_ENABLE_V2
-
 ETCD_ENV_FILE_EOF
+  fi
 }
 
 hasOnlyV3Data() {
   local v2Keys
-  v2Keys=$(ETCDCTL_API=2 etcdctl --endpoints=$(buildClientUrls) ls) || return 1
+  if [ $ENABLE_TLS = "true" ]; then
+    local etcdctlInit=$(etcdctlInitFun)
+    etcdctlInit=`echo ${etcdctlInit}|sed "s/--cert/--cert-file/g"|sed "s/--key/--key-file/g"|sed "s/--cacert/--ca-file/g"`
+    v2Keys=`$(ETCDCTL_API=2 $etcdctlInit --endpoints=$(buildClientDomainUrls) ls)` || return 1
+  else
+    v2Keys=`$(ETCDCTL_API=2 etcdctl --endpoints=$(buildClientUrls) ls)` || return 1
+  fi
   [ -z "$v2Keys" ]
 }
 
 # $ etctctl member list
-# 8c2386146dd0f0ce, unstarted, , http://192.168.2.5:2380,
-# b15d3498c7e3a169, started, etcd-1, http://192.168.2.3:2380, http://192.168.2.3:2379
+# 8c2386146dd0f0ce, unstarted, , https://192.168.2.5:2380,
+# b15d3498c7e3a169, started, etcd-1, https://192.168.2.3:2380, https://192.168.2.3:2379
 
 addMember() {
   etcdctl member list | grep -q " ${1#*=}" || etcdctl member add ${1/=/ --peer-urls=}
@@ -141,7 +251,13 @@ checkMemberRemoved() {
 findMemberId() {
   local eps="$(joinArgs $(buildEndpoints))" member
   [ -z "$2" ] || eps=$(buildClientUrls $2)
-  member=$(etcdctl   member list | grep "http://$1:")
+  member=""
+  result=`echo "$1"|grep ${ETCD_CLUSTER_DNS}`
+  if [ "$result" != "" ];then
+     member=$(etcdctl   member list | grep "https://$1:")
+  else
+     member=$(etcdctl   member list | grep "http://$1:")
+  fi
   log "Found member '$member' of '$1' with endpoint $eps ..."
   echo -n ${member%%, *}
 }
@@ -167,14 +283,15 @@ checkStopped() {
   ! svc is-active -q
 }
 
-
+#-----用户认证功能开始-------
 updateEtcdPasswdFile(){
   echo "EtcdRootOriginalPasswd=${ETCDDEFAULTPASSWD}">$etcdAuthPasswdFile
 }
 
 updateEtcdPasswd(){
   EtcdRootOriginalPasswd=`cat $etcdAuthPasswdFile |tr '=' ' '|awk '{print $2}'`
-  ETCDCTL_ENDPOINTS=$(joinArgs $(buildEndpoints)) runCmd /opt/etcd/current/etcdctl  --user="${ETCDDEFAULTUSER}:${EtcdRootOriginalPasswd}" user passwd root <<END
+  etcdctlInit=$(etcdctlInitFun)
+  ETCDCTL_ENDPOINTS=$(joinArgs $(buildEndpoints)) runCmd $etcdctlInit  --user="${ETCDDEFAULTUSER}:${EtcdRootOriginalPasswd}" user passwd root <<END
 ${ETCDDEFAULTPASSWD}
 ${ETCDDEFAULTPASSWD}
 END
@@ -182,10 +299,11 @@ END
 }
 
 etcdctlReverse() {
+   etcdctlInit=$(etcdctlInitFun)
    if [ $ETCDAUTH = "true" ] ;then
-    ETCDCTL_ENDPOINTS=$(joinArgs $(buildEndpoints)) runCmd /opt/etcd/current/etcdctl $@
+    ETCDCTL_ENDPOINTS=$(joinArgs $(buildEndpoints)) runCmd $etcdctlInit $@
    else
-    ETCDCTL_ENDPOINTS=$(joinArgs $(buildEndpoints)) runCmd /opt/etcd/current/etcdctl  --user="${ETCDDEFAULTUSER}:${ETCDDEFAULTPASSWD}" $@
+    ETCDCTL_ENDPOINTS=$(joinArgs $(buildEndpoints)) runCmd $etcdctlInit  --user="${ETCDDEFAULTUSER}:${ETCDDEFAULTPASSWD}" $@
    fi
 }
 
@@ -211,9 +329,118 @@ updateEtcdAuth(){
     etcdctlReverse auth disable
   fi
 }
+#-----用户认证功能结束-------
+
+#----单节点恢复功能开始-------
+stopNodeEtcdService(){
+  if [ -f "/etc/systemd/system/etcd.service" ];then
+    systemctl stop etcd
+    mv /etc/systemd/system/etcd.service  /etc/systemd/system/etcd1.service
+    systemctl daemon-reload
+  fi
+}
 
 
+removeNodeAndaddNodeAgain(){
+  healthNode=$1
+  etcdctlInit=$(etcdctlInitFun)
+
+  #1.先从member list中通过endpoint health找到不健康的节点，并移除
+  allNodeClientURL=`$etcdctlInit member list --endpoints=${healthNode} |awk '{print $5}'|sed s/,/""/g|grep -v '^$'`
+  set +e
+  for nodeClientURL in $allNodeClientURL;do
+      echo "check nodeClientURL:$nodeClientURL health"
+      $etcdctlInit endpoint health  --endpoints=${nodeClientURL}
+      if [ $? -ne 0 ]; then
+         # 查看集群节点列表
+         unHealthNodeSerialNum=`$etcdctlInit member list --endpoints=${healthNode} |grep ${nodeClientURL%:*}|awk -F ',' '{print $1}'`
+         # 1ce6d6d01109192, started, etcd03, http://192.168.0.102:2380, http://192.168.0.102:2379
+         # 9b534175b46ea789, started, etcd01, http://192.168.0.100:2380, http://192.168.0.100:2379
+         # ac2f188e97f50eb7, started, etcd02, http://192.168.0.101:2380, http://192.168.0.101:2379
+         # 移除问题节点
+         $etcdctlInit member remove ${unHealthNodeSerialNum} --endpoints=${healthNode}
+      fi
+  done
+  #2.先从member list中状态不是started，并移除
+  unstartedMemIDs=`$etcdctlInit member list --endpoints=${healthNode}  |grep  "unstarted"|awk -F ',' '{print $1}'`
+  for unstartedMemID in $unstartedMemIDs;do
+       echo "remove unhealth node,NodeSerialNum: $unstartedMemID"
+      if [ $unstartedMemID != "" ];then
+        # 移除问题节点
+         $etcdctlInit member remove ${unstartedMemID} --endpoints=${healthNode}
+      fi
+  done
+
+   #每个节点只添加自己
+  unHealthNodeName=$(buildMemberName)
+  $etcdctlInit member add ${unHealthNodeName} --peer-urls="$(buildMemberDomainUrls)" --endpoints=${healthNode}
+  set -e
+}
 
 
+modifyCfgAndRestart(){
+   healthNode=$1
+   etcdctlInit=$(etcdctlInitFun)
+   rm -rf  /var/lib/etcd/default.etcd
+   cp /opt/app/conf/etcd.env  /opt/app/conf/etcd1.env
+   sed -i 's/ETCD_INITIAL_CLUSTER_STATE=new/ETCD_INITIAL_CLUSTER_STATE=existing/g' /opt/app/conf/etcd1.env
+   sed -i 's/etcd.env/etcd1.env/g'  /etc/systemd/system/etcd1.service
+   # 留下自己的 和 memberl list
+   allHealthnodelist=`$etcdctlInit   --endpoints=${healthNode} member list|grep -v unstarted|grep started |awk '{print $3"="$4}'|sed s/,/""/g`
+   echo "allHealthnodelist:$allHealthnodelist"
+   local ETCD_INITIAL_CLUSTER_values=""
+   for var in $allHealthnodelist;do
+      ETCD_INITIAL_CLUSTER_values=${ETCD_INITIAL_CLUSTER_values}${var}","
+   done
+   unHealthNode=$(buildMemberDomainUrls)
+   unHealthNodeName=$(buildMemberName)
+   ETCD_INITIAL_CLUSTER_values=${ETCD_INITIAL_CLUSTER_values}${unHealthNodeName}"="${unHealthNode}
+   echo "ETCD_INITIAL_CLUSTER_values:$ETCD_INITIAL_CLUSTER_values"
+
+   sed -i "/^ETCD_INITIAL_CLUSTER=/d" /opt/app/conf/etcd1.env
+   echo "ETCD_INITIAL_CLUSTER=$ETCD_INITIAL_CLUSTER_values" >> /opt/app/conf/etcd1.env
+   systemctl daemon-reload
+   systemctl start etcd1.service
+}
 
 
+verifyClusterHealth(){
+    etcdctlInit=$(etcdctlInitFun)
+    sleepMaxTime=0
+    eixtFlag=0
+    num=0
+    sleepTime=2
+    while :
+      do
+      num=`expr ${num} + 1`
+      echo " loop check cluster ,Check every ${sleepTime} seconds!"
+      $etcdctlInit endpoint health  --endpoints=$(buildClientDomainUrls)
+      if [ $? -eq 0 ]; then
+          break
+      fi
+      #循环验证多少秒,健康就返回正常,不健康就返回异常
+	    if [ ${sleepMaxTime} -ge 600 ];then
+	        echo "sleepMaxTime>=600,exit  check  ${ip} ${checkPort} loop "
+	        eixtFlag=20
+	        break
+	    fi
+
+	    sleepMaxTime=`expr ${sleepMaxTime} + ${sleepTime}`
+      sleep ${sleepTime}s
+      done
+
+    if [ ${eixtFlag} -ne 0 ];then
+        echo " ${ip} node repair fail！"
+        log  " ${ip} node repair fail！"; return $EC_REPAIR_FAILED
+    fi
+}
+
+machineEnvRecovery(){
+   mv /etc/systemd/system/etcd1.service  /etc/systemd/system/etcd.service
+   rm -rf /opt/app/conf/etcd1.env
+   sed -i 's/etcd1.env/etcd.env/g'  /etc/systemd/system/etcd.service
+   systemctl daemon-reload
+   systemctl stop  etcd1
+   systemctl start etcd
+}
+#----单节点恢复功能结束-------

@@ -84,7 +84,7 @@
         "description": "InstanceClassDescrip",
         "type": "integer",
         "default": 202,
-        "range": [101, 202],
+        "range": [101, 202, 0, 1],
         "required": "yes"
       }, {
         "key": "volume_size",
@@ -146,7 +146,7 @@
         "description": "InstanceClassDescrip",
         "type": "integer",
         "default": 202,
-        "range": [101, 202],
+        "range": [101, 202, 0, 1],
         "required": "yes"
       }]
     }]
@@ -186,30 +186,45 @@
         "range": ["true", "false"],
         "required": "no"
       },{
-        "key": "etcd_default_user",
-        "label": "etcd.default.user",
-        "description": "etcduserdescrip",
-        "type": "string",
-        "default": "root",
-        "required": "yes",
-        "range": ["root"],
-        "changeable": false
-        },{
-        "key": "etcd_default_passwd",
-        "label": "etcd.default.passwd",
-        "description": "etcdpasswddescrip",
-        "type": "password",
-        "default": "root",
-        "required": "yes"
-      },{
-        "key": "etcd_auth",
-        "label": "etcd.auth",
-        "description": "etcdauthdescrip",
+        "key": "enable_TLS",
+        "label": "enable.TLS",
+        "description": "enableTLSdescrip",
         "type": "string",
         "default": "false",
         "range": ["true", "false"],
         "required": "no",
         "expanded": false
+      },{
+        "key": "cluster_DNS",
+        "label": "cluster.DNS",
+        "description": "clusterDNSdescrip",
+        "type": "string",
+        "default": ".etcdsvc.common",
+        "pattern": "^(?=^.{3,255}$)(\\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62}){2,10}$",
+        "dependencies":[
+              {"refkey":"enable_TLS","values":["true"],"operator":"in"}
+        ],
+        "required": "yes"
+      },{
+        "key": "etcd_heartbeat_interval",
+        "label": "etcdheartbeatinterval",
+        "description": "etcdheartbeatintervaldescrip",
+        "type": "integer",
+        "changeable": true,
+        "default": 100,
+        "min": 50,
+        "max": 3000,
+        "required": "yes"
+      },{
+        "key": "etcd_election_timeout",
+        "label": "etcdelectiontimeout",
+        "description": "etcdelectiontimeoutdescrip",
+        "type": "integer",
+        "changeable": true,
+        "default": 1000,
+        "min": 500,
+        "max": 50000,
+        "required": "yes"
       }]
     }]
   },{
@@ -227,7 +242,22 @@
         "type": "string",
         "pattern": "(\\d+\\.){3}\\d+",
         "required": "yes"
-      }]
+      }, {
+        "key": "healthnode.ip",
+        "label": "Health Node IP",
+        "description": "",
+        "type": "string",
+        "pattern": "(\\d+\\.){3}\\d+",
+        "required": "yes"
+      },{
+        "key": "unhealthnode.ip",
+        "label": "unHealth Node IP",
+        "description": "repairMinorityNode descrip",
+        "type": "string",
+        "pattern": "(\\d+\\.){3}\\d+",
+        "required": "yes"
+      }
+      ]
     }]
   }]
 }

@@ -35,6 +35,8 @@
   "corednslb":"LB for coredns",
   "corednslbdescript":"Load balancer for coredns service",
   "nodeexporterdescrip": "Enable node_exporter,Monitor server CPU, memory, disk, I / O and other information,The default crawl address is http://IP:9100/metrics",
-  "node.exporter": "node_exporter"
-
+  "node.exporter": "node_exporter",
+  "clusterDNSdescrip": "Set the domain name. The default is. Etcdsvc.common. Finally, the domain name of the etcd node is etcd *. Etcdsvc.common (* is a number). If it is a proxy node, the domain name is proxy *. Etcdsvc.common; Please meet the format of. XXX when setting the domain name,. XXX at least twice and at most 10 times",
+  "TLSConnectionGuideDescrip": "When the etcd cluster starts TLS, obtain the following hosts domain name configuration and ca pem, client. pem, client-key. PEM certificate, configure the hostsdomain to the hosts of the host where your etcd client is located, and copy the three *.pem access certificates to the directory where the certificates are placed!",
+  "TLSConnectionGuide-column": "TLSConnectionGuide"
 }

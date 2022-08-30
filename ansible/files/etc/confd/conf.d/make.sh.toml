@@ -5,5 +5,5 @@ mode = "0700"
 keys = [
   "/",
 ]
-reload_cmd = "/opt/app/bin/make.sh; /opt/app/bin/ctl.sh update"
+reload_cmd = "/opt/app/bin/make.sh; /opt/app/bin/ctl.sh configureDomainName; /opt/app/bin/ctl.sh update"
 
