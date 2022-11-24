@@ -129,7 +129,7 @@ configureDomainName(){
    if [ "$IS_DELETED" != "true" ];then
       #未删除的节点,删除hosts文件中多余的域名与ip的对应关系
       hostsAllDomain=`cat /etc/hosts|grep -e ${ETCD_CLUSTER_DNS}|awk '{print $1 "  " $2}'`
-      DELETED_NODES_HOSTS="$DELETED_NODES_HOSTS_DOMAIN"
+      DELETED_NODES_HOSTS="$DELETED_NODES_HOSTS_DOMAIN $DELETED_PROXY_HOSTS_DOMAIN"
       if [ "${hostsAllDomain}" != "" ] && [ "${DELETED_NODES_HOSTS}" != "" ]; then
          local count=0
          for var in $hostsAllDomain;do

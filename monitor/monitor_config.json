@@ -1,0 +1,236 @@
+{
+    "target_path": "/opt/app/bin/monitor.sh",
+    "cluster": {
+        "roles": [
+            "etcd_proxy",
+            "etcd_node"
+        ],
+        "cmd": "bash /opt/app/bin/monitor.sh cluster",
+        "interval": 10,
+        "timeout": 20
+    },
+    "nodes": {
+        "roles": [
+            "etcd_proxy",
+            "etcd_node"
+        ],
+        "cmd": "bash /opt/app/bin/monitor.sh node",
+        "interval": 10,
+        "timeout": 20
+    },
+    "items": {
+        "cluster_health": {
+            "level": 9,
+            "unit": "Times",
+            "zh": "集群健康状态",
+            "value_type": "int",
+            "statistics_type": "latest",
+            "min": 0,
+            "max": 3,
+            "suggest": {
+                "=0": {"level": 5, "msg": "集群健康"},
+                "=1": {"level": 5, "msg": "部分从节点不健康，不影响集群运行，但影响高可用"},
+                "=2": {"level": 5, "msg": "集群无法使用，需要联系管理员"}
+            }
+        },
+        "node_health": {
+            "level": 9,
+            "unit": "Times",
+            "zh": "节点健康状态",
+            "value_type": "int",
+            "statistics_type": "latest",
+            "min": 0,
+            "max": 2,
+            "suggest": {
+                "=0": {"level": 5, "msg": "节点健康"},
+                "=1": {"level": 5, "msg": "节点无法使用，需要联系管理员"}
+            }
+        },
+        "etcd_server_has_leader": {
+            "level": 3,
+            "unit": "Times",
+            "zh": "是否有leader",
+            "value_type": "int",
+            "min": 0,
+            "max": 1,
+            "statistics_type": "latest",
+            "scale_factor_when_display": 1
+        },
+        "etcd_server_is_leader": {
+            "level": 3,
+            "unit": "Times",
+            "zh": "是否是leader",
+            "value_type": "int",
+            "min": 0,
+            "max": 1,
+            "statistics_type": "latest",
+            "scale_factor_when_display": 1
+        },
+        "etcd_server_leader_changes_seen_total": {
+            "level": 3,
+            "unit": "Times",
+            "zh": "leader切换次数",
+            "value_type": "int",
+            "min": 0,
+            "statistics_type": "latest",
+            "scale_factor_when_display": 1
+        },
+        "etcd_network_peer_sent_bytes_total": {
+            "unit": "Bytes",
+            "zh": "向其他节点发送的字节数",
+            "value_type": "int",
+            "statistics_type": "latest",
+            "scale_factor_when_display": 1
+        },
+        "etcd_server_proposals_failed_total": {
+            "unit": "Times",
+            "zh": "失败提案数",
+            "value_type": "int",
+            "statistics_type": "latest",
+            "scale_factor_when_display": 1
+        },
+        "process_resident_memory_bytes": {
+            "unit": "Bytes",
+            "zh": "常驻内存字节数",
+            "value_type": "int",
+            "statistics_type": "latest",
+            "scale_factor_when_display": 1
+        },
+        "process_virtual_memory_bytes": {
+            "unit": "Bytes",
+            "zh": "虚拟内存字节数",
+            "value_type": "int",
+            "statistics_type": "latest",
+            "scale_factor_when_display": 1
+        },
+        "etcd_debugging_mvcc_range_total": {
+            "unit": "counter",
+            "zh": "此成员看到的范围总数",
+            "value_type": "int",
+            "statistics_type": "latest",
+            "scale_factor_when_display": 1
+        },
+        "etcd_debugging_mvcc_txn_total": {
+            "unit": "counter",
+            "zh": "此成员看到的txn总数",
+            "value_type": "int",
+            "statistics_type": "latest",
+            "scale_factor_when_display": 1
+        },
+        "etcd_debugging_mvcc_events_total": {
+            "unit": "counter",
+            "zh": "此成员发送的事件总数",
+            "value_type": "int",
+            "statistics_type": "latest",
+            "scale_factor_when_display": 1
+        },
+        "process_start_time_seconds": {
+            "unit": "seconds",
+            "zh": "Etcd server 开始时间（秒）",
+            "value_type": "int",
+            "statistics_type": "latest",
+            "scale_factor_when_display": 1
+        },
+        "etcd_server_proposals_applied_total": {
+            "unit": "counter",
+            "zh": "Etcd server 一致提案总数",
+            "value_type": "int",
+            "statistics_type": "latest",
+            "scale_factor_when_display": 1
+        },
+        "etcd_server_proposals_pending": {
+            "unit": "counter",
+            "zh": "当前待提交提案的数量",
+            "value_type": "int",
+            "statistics_type": "latest",
+            "scale_factor_when_display": 1
+        },
+        "etcd_network_client_grpc_received_bytes_total": {
+            "unit": "Bytes",
+            "zh": "接收到grpc客户端的字节总数",
+            "value_type": "int",
+            "statistics_type": "latest",
+            "scale_factor_when_display": 1
+        },
+        "etcd_debugging_mvcc_keys_total": {
+            "unit": "counter",
+            "zh": "key总数",
+            "value_type": "int",
+            "statistics_type": "latest",
+            "scale_factor_when_display": 1
+        },
+        "process_cpu_seconds_total": {
+            "unit": "seconds",
+            "zh": "用户和系统以秒为单位花费的总CPU时间",
+            "value_type": "int",
+            "statistics_type": "latest",
+            "scale_factor_when_display": 1
+        },
+        "process_open_fds": {
+            "unit": "counter",
+            "zh": "打开文件描述符的数量",
+            "value_type": "int",
+            "statistics_type": "latest",
+            "scale_factor_when_display": 1
+        },
+        "process_max_fds": {
+            "unit": "counter",
+            "zh": "打开文件描述符的最大数量",
+            "value_type": "int",
+            "statistics_type": "latest",
+            "scale_factor_when_display": 1
+        },
+        "etcd_debugging_mvcc_put_total": {
+            "unit": "counter",
+            "zh": "此成员看到的插入总数",
+            "value_type": "int",
+            "statistics_type": "latest",
+            "scale_factor_when_display": 1
+        },
+        "etcd_debugging_mvcc_db_compaction_keys_total": {
+            "unit": "counter",
+            "zh": "压缩的数据库key总数",
+            "value_type": "int",
+            "statistics_type": "latest",
+            "scale_factor_when_display": 1
+        }
+    },
+   "item_groups": {
+        "cluster": {
+            "items": ["cluster_health"],
+            "alarms": ["cluster_health"]
+        },
+        "roles": [
+            {
+                "role": "etcd_node",
+                "items": ["node_health",
+                          "etcd_network_peer_sent_bytes_total",
+                          "etcd_server_has_leader",
+                          "etcd_server_is_leader",
+                          "etcd_server_leader_changes_seen_total",
+                          "etcd_server_proposals_failed_total",
+                          "process_resident_memory_bytes",
+                          "process_virtual_memory_bytes",
+                          "etcd_debugging_mvcc_range_total",
+                          "etcd_debugging_mvcc_txn_total",
+                          "etcd_debugging_mvcc_events_total",
+                          "process_start_time_seconds",
+                          "etcd_server_proposals_applied_total",
+                          "etcd_server_proposals_pending",
+                          "etcd_network_client_grpc_received_bytes_total",
+                          "etcd_debugging_mvcc_keys_total",
+                          "process_cpu_seconds_total",
+                          "process_open_fds",
+                          "process_max_fds",
+                          "etcd_debugging_mvcc_put_total",
+                          "etcd_debugging_mvcc_db_compaction_keys_total"],
+                "alarms": ["node_health"]
+            }, {
+                "role": "etcd_proxy",
+                "items": ["node_health"],
+                "alarms": ["node_health"]
+            }
+
+        ]
+    }
+}

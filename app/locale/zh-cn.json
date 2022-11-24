@@ -63,7 +63,7 @@
   "etcdpasswddescrip": "为etcd创建root用户的密码，可以修改，默认密码为root；集群创建好之后输入新的密码会覆盖原密码",
   "etcd.auth": "etcd auth",
   "etcdauthdescrip": "关闭、开启用户认证",
-  "enableTLSdescrip": "关闭、开启TLS认证",
+  "enableTLSdescrip": "关闭、开启TLS认证(如果本集群为QKE集群的对接服务，为保证QKE集群正常使用，不允许切换TLS开关状态)",
   "clusterDNSdescrip": "设置域名，默认是.etcdsvc.common,最终etcd节点的域名是etcd1.etcdsvc.common（这里的3级域名etcd1中etcd固定的，1是etcd节点唯一数字编号），如果是代理节点，域名是proxy1.etcdsvc.common；设置域名是请满足.xxx的格式，.xxx至少2次，最多10次",
   "TLSConnectionGuide-column": "TLS连接指南",
   "TLSConnectionGuideDescrip": "当ETCD集群开启TLS，获取如下的hosts域名配置以及ca.pem, client.pem, client-key.pem 证书，将hostsDomain配置到您的ETCD客户端所在的主机的hosts中，将3个*.pem访问证书分别复制到您使用证书的目录！",
