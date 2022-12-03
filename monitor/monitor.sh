@@ -96,7 +96,7 @@ cluster() {
   clusterhealth=""
   if [ $allNodesNum -eq $healthNodesNum ]; then
     clusterhealth=0
-  elif [ $healthNodesNum -gt $legalMembers ]; then
+  elif [ $healthNodesNum -ge $legalMembers ]; then
     clusterhealth=1
   elif [ $healthNodesNum -lt $legalMembers ]; then
     clusterhealth=2
