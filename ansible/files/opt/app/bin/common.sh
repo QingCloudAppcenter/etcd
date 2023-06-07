@@ -16,9 +16,12 @@ EC_MEMBER_EXISTS=15        # scale: member still exists
 EC_REPAIR_ILLEGAL_NODE=16  # repair: source node is outside cluster
 EC_UNHEALTHY=17            # check: cluster is unhealthy
 EC_NO_MEMBER_ID=18         # member: failed to find ID
+EC_NO_CA=19                # ca: failed to CA
+EC_REPAIR_FAILED=20        # repair: failed to repair
+EC_REPAIR_IP_FAILED=21        # repair: Normal node input error or Abnormal node input error
 
 workingDir=/var/lib/etcd
-appctlDir=$workingDir/appctl
+appctlDir=$workingDir/appctl  # Log Dir
 
 log() {
   logger -t $MY_ROLE.appctl --id=$$ [cmd=$command role=$MY_ROLE] "$@" || return $EC_LOGGING

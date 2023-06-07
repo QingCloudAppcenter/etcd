@@ -4,8 +4,8 @@
   no_log: False
   remote_user: root
   vars:
-    etcdVersion: v3.2.24
-    etcdVersion2: v3.3.11
+    etcdVersion: v3.4.0
+    etcdVersion2: v3.4.16
     target_env: "{{ lookup('env', 'target') }}"
     local_cache_path: "~/.ansible/cache"
     # ansible_ssh_pass: Zhu1241jie
@@ -20,7 +20,8 @@
       - disable-apt-jobs-1.0.0
       - disable-motd-1.0.0
       - app-agent-1.0.6
-      - arping-1.0.0
+      - arping-1.0.5
+      - node-exporter-0.18.1
       loop_control:
         loop_var: service_name
 
@@ -39,22 +40,38 @@
         comment: "etcd Service User"
         state: present
 
-    - name: Copy confd toml files
+    - name: Copy confd make.toml files
       copy:
         src: files/etc/confd/conf.d/make.sh.toml
         dest: /etc/confd/conf.d/make.sh.toml
 
+    - name: Copy confd nodeexporter.toml files
+      copy:
+          src: files/etc/confd/conf.d/nodeexporter.sh.toml
+          dest: /etc/confd/conf.d/nodeexporter.sh.toml
+
+#    - name: Copy confd etcdauth.sh.toml files
+#      copy:
+#          src: files/etc/confd/conf.d/etcdauth.sh.toml
+#          dest: /etc/confd/conf.d/etcdauth.sh.toml
+
+
+    - name: Copy confd tls.sh.toml files
+      copy:
+        src: files/etc/confd/conf.d/tls.sh.toml
+        dest: /etc/confd/conf.d/tls.sh.toml
+
     - name: Compile tmpl files
       raw: |
-        srcDir=files/etc/confd
-        destDir=files/tmp/confd
-        rm -rf $destDir
-        mkdir -p $destDir/conf.d $destDir/templates
-        tmplFile=$destDir/templates/make.sh.tmpl
-        for tmpl in $(ls $srcDir/templates/*); do
-          cat $tmpl >> $tmplFile
-          echo >> $tmplFile
-        done
+          srcDir=files/etc/confd
+          destDir=files/tmp/confd
+          rm -rf $destDir
+          mkdir -p $destDir/conf.d $destDir/templates
+          tmplFile=$destDir/templates/make.sh.tmpl
+          for tmpl in $(ls $srcDir/templates/01.header.sh.tmpl $srcDir/templates/02.app.env.tmpl); do
+            cat $tmpl >> $tmplFile
+            echo >> $tmplFile
+          done
       delegate_to: localhost
       run_once: true
 
@@ -62,6 +79,21 @@
       copy:
         src: files/tmp/confd/templates/make.sh.tmpl
         dest: /etc/confd/templates/make.sh.tmpl
+
+    - name: Copy confd nodeexporter.tmpl files
+      copy:
+        src: files/etc/confd/templates/nodeexporter.sh.tmpl
+        dest: /etc/confd/templates/nodeexporter.sh.tmpl
+
+#    - name: Copy confd etcdauth.sh.tmpl files
+#      copy:
+#          src: files/etc/confd/templates/etcdauth.sh.tmpl
+#          dest: /etc/confd/templates/etcdauth.sh.tmpl
+
+    - name: Copy confd tls.sh.tmpl files
+      copy:
+          src: files/etc/confd/templates/tls.sh.tmpl
+          dest: /etc/confd/templates/tls.sh.tmpl
 
     - name: Prepare directories
       file:
@@ -94,9 +126,30 @@
 
     - name: Create symbolic Link
       file:
-        src: "/opt/etcd/{{ etcdVersion }}"
+        src: "/opt/etcd/{{ etcdVersion2 }}"
         dest: "/opt/etcd/current"
         state: link
+
+    - name: Download install cfssl tools
+      get_url:
+        url: "https://pkg.cfssl.org/R1.2/{{ item }}"
+        dest: /usr/local/bin
+        mode: 0755
+        owner: root
+      delegate_to: localhost
+      with_items:
+        - "cfssl_linux-amd64"
+        - "cfssljson_linux-amd64"
+        - "cfssl-certinfo_linux-amd64"
+
+    - name: Move cfssl_linux-amd64 to cfssl
+      command: mv /usr/local/bin/cfssl_linux-amd64  /usr/local/bin/cfssl
+
+    - name: Move cfssljson_linux-amd64 to cfssljson
+      command: mv /usr/local/bin/cfssljson_linux-amd64  /usr/local/bin/cfssljson
+
+    - name: Move cfssl-certinfo_linux-amd64 to cfssl-certinfo
+      command: mv /usr/local/bin/cfssl-certinfo_linux-amd64  /usr/local/bin/cfssl-certinfo
 
     - name: Copy systemd files
       copy:
@@ -125,11 +178,11 @@
         path: "{{ item }}"
         owner: root
         group: "{{ user }}"
-        mode: u=rwx,g=rx,o=
+        mode: u=rwx,g=rx,o=rx
         recurse: yes
       with_items:
         - /etc/confd
-        - /opt
+        - /opt/
 
     - name: Prepare local SSH directory
       file:

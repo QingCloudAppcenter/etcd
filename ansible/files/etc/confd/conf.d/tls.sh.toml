@@ -1,0 +1,9 @@
+[template]
+src = "tls.sh.tmpl"
+dest = "/opt/app/bin/tls.sh"
+mode = "0700"
+keys = [
+  "/",
+]
+
+
